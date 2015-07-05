@@ -12,9 +12,9 @@ BareFatJets::BareFatJets(){
     prunedMass = NULL;
     filteredMass = NULL;
     softdropMass = NULL;
-    ak8_subjet = NULL;
-    ak8jet_hasSubjet = NULL;
-    ak8subjet_btag = NULL;
+    subjets = NULL;
+    hasSubjet = NULL;
+    subjetBtag = NULL;
 
 }
 
@@ -34,9 +34,9 @@ void BareFatJets::clear(){
     prunedMass -> clear();
     filteredMass -> clear();
     softdropMass -> clear();
-    ak8_subjet->Clear();
-    ak8subjet_btag ->clear();
-    ak8jet_hasSubjet->clear();
+    subjets->Clear();
+    subjetBtag ->clear();
+    hasSubjet->clear();
 }
 
 void BareFatJets::defineBranches(TTree *t){
@@ -66,12 +66,12 @@ void BareFatJets::defineBranches(TTree *t){
     softdropMass = new vector<float>;
     t->Branch("fatjetSoftdropMass","vector<float>",&softdropMass);
 
-    ak8_subjet = new TClonesArray("TLorentzVector", 20);
-    t->Branch("ak8_subjet","TClonesArray", &ak8_subjet, 128000, 0);
-    ak8jet_hasSubjet =  new vector<int>;
-    t->Branch("ak8jet_hasSubjet","vector<int>",&ak8jet_hasSubjet);
-    ak8subjet_btag =  new vector<float>;
-    t->Branch("ak8subjet_btag","vector<float>",&ak8subjet_btag);
+    subjets = new TClonesArray("TLorentzVector", 20);
+    t->Branch("subjets","TClonesArray", &subjets, 128000, 0);
+    hasSubjet =  new vector<int>;
+    t->Branch("hasSubjet","vector<int>",&hasSubjet);
+    subjetBtag =  new vector<float>;
+    t->Branch("subjetBtag","vector<float>",&subjetBtag);
 
 }
 
@@ -103,10 +103,10 @@ void BareFatJets::setBranchAddresses(TTree *t){
     t->SetBranchAddress("fatjetFilteredMass"	,&filteredMass);
     t->SetBranchAddress("fatjetSoftdropMass"	,&softdropMass);
 
-    ak8_subjet = new TClonesArray("TLorentzVector", 20);
-    t->SetBranchAddress("ak8_subjet"	,&ak8_subjet);
-    t->SetBranchAddress("ak8jet_hasSubjet",&ak8jet_hasSubjet);
-    t->SetBranchAddress("ak8subjet_btag",&ak8subjet_btag);
+    subjets = new TClonesArray("TLorentzVector", 20);
+    t->SetBranchAddress("subjets"	,&subjets);
+    t->SetBranchAddress("hasSubjet",&hasSubjet);
+    t->SetBranchAddress("subjetBtag",&subjetBtag);
 }
 // Local Variables:
 // mode:c++

@@ -27,26 +27,26 @@ int NeroFatJets::analyze(const edm::Event& iEvent){
 
         // GET  ValueMaps
 
-        // Fill output object	
+        // Fill output object
         //p4 -> AddLast(new TLorentzVector(j.px(), j.py(), j.pz(), j.energy())  );
         new ( (*p4)[p4->GetEntriesFast()]) TLorentzVector(j.px(), j.py(), j.pz(), j.energy());
 
         rawPt -> push_back (j.pt()*j.jecFactor("Uncorrected"));
         flavour -> push_back( j.partonFlavour() );
-        tau1 -> push_back(j.userFloat("NjettinessAK8:tau1"));
-        tau2 -> push_back(j.userFloat("NjettinessAK8:tau2"));
-        tau3 -> push_back(j.userFloat("NjettinessAK8:tau3"));
+        tau1 -> push_back(j.userFloat("Njettiness:tau1"));
+        tau2 -> push_back(j.userFloat("Njettiness:tau2"));
+        tau3 -> push_back(j.userFloat("Njettiness:tau3"));
 
-        trimmedMass ->push_back(j.userFloat("ak8PFJetsCHSTrimmedMass"));
-        prunedMass  ->push_back(j.userFloat("ak8PFJetsCHSPrunedMass"));
-        filteredMass->push_back(j.userFloat("ak8PFJetsCHSFilteredMass"));
-        softdropMass->push_back(j.userFloat("ak8PFJetsCHSSoftDropMass"));
-        ak8jet_hasSubjet->push_back(j.hasSubjets("SoftDrop"));
+        trimmedMass ->push_back(j.userFloat("PFJetsCHSTrimmedMass"));
+        prunedMass  ->push_back(j.userFloat("PFJetsCHSPrunedMass"));
+        filteredMass->push_back(j.userFloat("PFJetsCHSFilteredMass"));
+        softdropMass->push_back(j.userFloat("PFJetsCHSSoftDropMass"));
+        hasSubjet->push_back(j.hasSubjets(fSubjetsName));
 
-        auto Subjets = j.subjets("SoftDrop");
+        auto Subjets = j.subjets(fSubjetsName);
         for ( auto const & i : Subjets ) {
-            new ( (*ak8_subjet)[nsubjet]) TLorentzVector(i->px(), i->py(), i->pz(), i->energy());
-            ak8subjet_btag->push_back(i->bDiscriminator("pfCombinedInclusiveSecondaryVertexV2BJetTags"));
+            new ( (*subjets)[nsubjet]) TLorentzVector(i->px(), i->py(), i->pz(), i->energy());
+            subjetBtag->push_back(i->bDiscriminator("pfCombinedInclusiveSecondaryVertexV2BJetTags"));
             nsubjet++;
         }
 

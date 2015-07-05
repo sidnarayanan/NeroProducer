@@ -28,9 +28,9 @@ class BareFatJets : virtual public BareP4
         vector<float> *filteredMass;
         vector<float> *softdropMass;
 
-        TClonesArray  *ak8_subjet;
-        vector<int>   *ak8jet_hasSubjet;
-        vector<float> *ak8subjet_btag;
+        TClonesArray  *subjets;
+        vector<int>   *hasSubjet;
+        vector<float> *subjetBtag;
 
 
 };

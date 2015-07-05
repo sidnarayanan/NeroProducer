@@ -5,7 +5,7 @@
 #include "NeroProducer/Core/interface/BareFatJets.hpp"
 
 
-class NeroFatJets : virtual public NeroCollection, 
+class NeroFatJets : virtual public NeroCollection,
     virtual public BareFatJets
 {
     public:
@@ -16,10 +16,16 @@ class NeroFatJets : virtual public NeroCollection,
 
         // --- specific fuctions
         // --- Handle
-        edm::Handle<pat::JetCollection> handle;	
+        edm::Handle<pat::JetCollection> handle;
 
         // --- Token
         edm::EDGetTokenT<pat::JetCollection> token;
+
+        void SetSubjetsName (std::string n) { fSubjetsName = n;    }
+        std::string SubjetsName()           { return fSubjetsName; }
+
+      protected:
+        std::string fSubjetsName;
 
 
 

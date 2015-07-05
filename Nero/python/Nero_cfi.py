@@ -1,14 +1,7 @@
 import FWCore.ParameterSet.Config as cms
 
-from subprocess import check_output
-import os
-
 #------------------------------------------------------
 nero = cms.EDAnalyzer("Nero",
-    info = cms.string("Nero"),
-    head = cms.string( check_output("cd "+os.environ['CMSSW_BASE']+"/src/NeroProducer/ && git rev-parse HEAD && cd - 2>&1 >/dev/null",shell=True) ) ,
-    tag  = cms.string( check_output("cd " +os.environ["CMSSW_BASE"] +"/src/NeroProducer && { git describe --tags || true ; } && cd - 2>&1 >/dev/null",shell=True) ) ,
-
     vertices = cms.InputTag("offlineSlimmedPrimaryVertices"),
     rho = cms.InputTag("fixedGridRhoFastjetAll"),
     muons = cms.InputTag("slimmedMuons"),
@@ -17,6 +10,7 @@ nero = cms.EDAnalyzer("Nero",
     photons = cms.InputTag("slimmedPhotons"),
     jets = cms.InputTag("slimmedJets"),
     fatjets = cms.InputTag("slimmedJetsAK8"),
+    subjets = cms.string("SubJets"),
     mets = cms.InputTag("slimmedMETs"),
     # gen
     pileup = cms.InputTag("addPileupInfo"),
@@ -50,8 +44,6 @@ nero = cms.EDAnalyzer("Nero",
     minJetEta = cms.double (2.5),
     minJetN   = cms.int32  (0),
     minJetId  = cms.string ('loose'),
-    matchJet  = cms.bool (True),
-    matchJetDr = cms.double(0.3),
 
     minElePt  = cms.double (10.),
     minEleEta = cms.double (2.5),
@@ -60,28 +52,21 @@ nero = cms.EDAnalyzer("Nero",
     minMuPt   = cms.double (10.),
     minMuEta  = cms.double (2.4),
     maxMuIso  = cms.double (0.2),
-   
+
     minLepN   = cms.int32 (0),
-    matchLep  = cms.bool (True),
-    matchLepDr = cms.double (0.1),
 
     minTauPt  = cms.double (18.),
     minTauEta = cms.double (2.3),
     minTauN   = cms.int32  (0),
-    minTauId  = cms.string ('decayModeFindingNewDMs'),
-    maxTauIso = cms.double (-1),
-    extendTau = cms.bool(False),
-    matchTau  = cms.bool (True),
-    matchTauDr = cms.double (0.1),
+    minTauId  = cms.string ('decayModeFinding'),
+    maxTauIso = cms.double (-1.),
 
     minGenParticlePt = cms.double(5.),
     minGenJetPt = cms.double(20.),
-                      
+
     minPhoPt  = cms.double (15.),
     minPhoEta = cms.double (2.5),
     minPhoN   = cms.int32  (0),
     maxPhoIso = cms.double (-1.),
-    matchPho  = cms.bool (False),
-    matchPhoDr = cms.double (0.3),
 )
 #------------------------------------------------------
