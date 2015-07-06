@@ -1,6 +1,8 @@
 <use name="FWCore/Framework"/>
 <use name="FWCore/PluginManager"/>
 <use name="FWCore/ParameterSet"/>
+<use name="FWCore/ServiceRegistry"/>
+<use name="FWCore/Utilities"/>
 <!--  -->
 <use name="DataFormats/PatCandidates"/>
 <use name="DataFormats/VertexReco"/>
@@ -10,6 +12,9 @@
 <use name="DataFormats/PatCandidates"/>
 <use name="DataFormats/Candidate" />
 <use name="DataFormats/HepMCCandidate" />
+<!-- -->
+<use name="RecoBTau/JetTagComputer"/>
+<use name="RecoBTag/SecondaryVertex"/>
 <!--  -->
 <use name="CommonTools/UtilAlgos"/>
 <use name="CommonTools/Utils"/>
@@ -23,6 +28,8 @@
 <use name="clhep"/>
 <use name="RooFit"/>
 <use name="root"/>
+<use name="fastjet"/>
+<use name="fastjet-contrib"/>
 <export>
 	<lib name="1"/>
 </export>

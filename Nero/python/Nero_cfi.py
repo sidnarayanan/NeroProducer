@@ -10,6 +10,8 @@ nero = cms.EDAnalyzer("Nero",
     photons = cms.InputTag("slimmedPhotons"),
     jets = cms.InputTag("slimmedJets"),
     fatjets = cms.InputTag("slimmedJetsAK8"),
+    fatjetsCA8 = cms.InputTag("slimmedJetsCA8"),
+    fatjetsCA15 = cms.InputTag("slimmedJetsCA15"),
     subjets = cms.string("SubJets"),
     mets = cms.InputTag("slimmedMETs"),
     # gen

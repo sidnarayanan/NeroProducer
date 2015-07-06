@@ -7,7 +7,7 @@ process.load("FWCore.MessageService.MessageLogger_cfi")
 process.MessageLogger.cerr.FwkReport.reportEvery = cms.untracked.int32(10000)
 
 
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(500) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 
 # process.source = cms.Source("PoolSource",
 #     fileNames = cms.untracked.vstring(
@@ -22,7 +22,7 @@ process.source = cms.Source("PoolSource",
 
 process.skimmedMETs  = cms.EDFilter("PATMETSelector",
                                     src = cms.InputTag("slimmedMETs"),
-                                    cut = cms.string("energy > 200"),
+                                    cut = cms.string("energy > 100"),
                                     filter = cms.bool(True)
                                     )
 process.filter = cms.Path(process.skimmedMETs)
@@ -39,12 +39,18 @@ process.outPut = cms.OutputModule("PoolOutputModule",
         "keep patJets_packedPatJetsPFCHS8_*_*",
         "keep patJets_selectedPatJetsPFCHS15_*_*",
         "keep patJets_packedPatJetsPFCHS15_*_*",
-        "keep patJets_selectedPatJetsSoftDropPFCHS_*_*",
-        "keep patJets_selectedPatJetsSoftDropSubjetsPFCHS_*_*",
-        "keep patJets_selectedPatJetsSoftDropPFCHSPacked_*_*",
-        "keep patJets_selectedPatJetsPrunedPFCHS_*_*",
-        "keep patJets_selectedPatJetsPrunedSubjetsPFCHS_*_*",
-        "keep patJets_selectedPatJetsPrunedPFCHSPacked_*_*",
+        "keep patJets_selectedPatJetsSoftDropPFCHS8_*_*",
+        "keep patJets_selectedPatJetsSoftDropSubjetsPFCHS8_*_*",
+        "keep patJets_selectedPatJetsSoftDropPFCHSPacked8_*_*",
+        "keep patJets_selectedPatJetsPrunedPFCHS8_*_*",
+        "keep patJets_selectedPatJetsPrunedSubjetsPFCHS8_*_*",
+        "keep patJets_selectedPatJetsPrunedPFCHSPacked8_*_*",
+        "keep patJets_selectedPatJetsSoftDropPFCHS15_*_*",
+        "keep patJets_selectedPatJetsSoftDropSubjetsPFCHS158_*_*",
+        "keep patJets_selectedPatJetsSoftDropPFCHSPacked15_*_*",
+        "keep patJets_selectedPatJetsPrunedPFCHS15_*_*",
+        "keep patJets_selectedPatJetsPrunedSubjetsPFCHS15_*_*",
+        "keep patJets_selectedPatJetsPrunedPFCHSPacked15_*_*",
         "keep *_skimmedMETs_*_SKIM"
         ),
                                   fileName = cms.untracked.string("skim.root")
@@ -117,6 +123,45 @@ process.ak4PFJets = ak4PFJets.clone(src = 'pfNoElectronsCHS', doAreaFastjet = Tr
 process.load("PhysicsTools.PatAlgos.producersLayer1.patCandidates_cff")
 process.load("PhysicsTools.PatAlgos.selectionLayer1.selectedPatCandidates_cff")
 
+
+bTagInfos = [
+    'pfImpactParameterTagInfos'
+   ,'pfSecondaryVertexTagInfos'
+   ,'pfInclusiveSecondaryVertexFinderTagInfos'
+   ,'softPFMuonsTagInfos'
+   ,'softPFElectronsTagInfos'
+]
+## b-tag discriminators
+bTagDiscriminators = [
+     'pfJetBProbabilityBJetTags'
+    ,'pfJetProbabilityBJetTags'
+    ,'pfPositiveOnlyJetBProbabilityBJetTags'
+    ,'pfPositiveOnlyJetProbabilityBJetTags'
+    ,'pfNegativeOnlyJetBProbabilityBJetTags'
+    ,'pfNegativeOnlyJetProbabilityBJetTags'
+    ,'pfTrackCountingHighPurBJetTags'
+    ,'pfTrackCountingHighEffBJetTags'
+    ,'pfNegativeTrackCountingHighPurBJetTags'
+    ,'pfNegativeTrackCountingHighEffBJetTags'
+    ,'pfSimpleSecondaryVertexHighEffBJetTags'
+    ,'pfSimpleSecondaryVertexHighPurBJetTags'
+    ,'pfNegativeSimpleSecondaryVertexHighEffBJetTags'
+    ,'pfNegativeSimpleSecondaryVertexHighPurBJetTags'
+    ,'pfCombinedSecondaryVertexV2BJetTags'
+    ,'pfPositiveCombinedSecondaryVertexV2BJetTags'
+    ,'pfNegativeCombinedSecondaryVertexV2BJetTags'
+    ,'pfCombinedInclusiveSecondaryVertexV2BJetTags'
+    ,'pfPositiveCombinedInclusiveSecondaryVertexV2BJetTags'
+    ,'pfNegativeCombinedInclusiveSecondaryVertexV2BJetTags'
+    ,'softPFMuonBJetTags'
+    ,'positiveSoftPFMuonBJetTags'
+    ,'negativeSoftPFMuonBJetTags'
+    ,'softPFElectronBJetTags'
+    ,'positiveSoftPFElectronBJetTags'
+    ,'negativeSoftPFElectronBJetTags'
+]
+
+
 from PhysicsTools.PatAlgos.tools.jetTools import *
 ## Switch the default jet collection (done in order to use the above specified b-tag infos and discriminators)
 switchJetCollection(
@@ -127,11 +172,15 @@ switchJetCollection(
     svSource = cms.InputTag(svSource),
     muSource = cms.InputTag(muSource),
     elSource = cms.InputTag(elSource),
+    btagInfos = bTagInfos,
+    btagDiscriminators = bTagDiscriminators,
     jetCorrections = jetCorrectionsAK4,
     genJetCollection = cms.InputTag(genJetCollection),
     genParticles = cms.InputTag(genParticles),
     postfix = postfix
 )
+
+
 
 #################################################
 ## Remake jets
@@ -150,7 +199,7 @@ process.PFJetsCHS8 = ak4PFJets.clone(
     src = (getattr(process,"ak4PFJets").src),
     srcPVs = (getattr(process,"ak4PFJets").srcPVs),
     doAreaFastjet = cms.bool(True),
-    jetPtMin = cms.double(450)
+    jetPtMin = cms.double(250)
 )
 ## Pruned fat jets (Gen and Reco) (each module produces two jet collections, fat jets and subjets)
 from RecoJets.JetProducers.SubJetParameters_cfi import SubJetParameters
@@ -172,7 +221,7 @@ process.PFJetsCHSPruned8 = ak4PFJetsPruned.clone(
     doAreaFastjet = cms.bool(True),
     writeCompound = cms.bool(True),
     jetCollInstanceName=cms.string("SubJets"),
-    jetPtMin = cms.double(450)
+    jetPtMin = cms.double(250)
 )
 ## SoftDrop fat jets (Gen and Reco) (each module produces two jet collections, fat jets and subjets)
 process.genJetsNoNuSoftDrop8 = ak4GenJets.clone(
@@ -196,7 +245,7 @@ process.PFJetsCHSSoftDrop8 = ak4PFJetsSoftDrop.clone(
     doAreaFastjet = cms.bool(True),
     writeCompound = cms.bool(True),
     jetCollInstanceName=cms.string("SubJets"),
-    jetPtMin = cms.double(450)
+    jetPtMin = cms.double(250)
 )
 
 ##
@@ -279,6 +328,8 @@ addJetCollection(
     svSource = cms.InputTag(svSource),
     muSource = cms.InputTag(muSource),
     elSource = cms.InputTag(elSource),
+    btagInfos = bTagInfos,
+    btagDiscriminators = bTagDiscriminators,
     jetCorrections = jetCorrectionsAK8,
     genJetCollection = cms.InputTag('genJetsNoNu8'),
     genParticles = cms.InputTag(genParticles),
@@ -291,6 +342,8 @@ addJetCollection(
     jetSource=cms.InputTag('PFJetsCHSSoftDrop8'),
     labelName='SoftDropPFCHS8',
     algo=algoLabel,
+    btagInfos = ['None'],
+    btagDiscriminators = ['None'],
     jetCorrections=jetCorrectionsAK8,
     genJetCollection = cms.InputTag('genJetsNoNu8'),
     genParticles = cms.InputTag(genParticles),
@@ -308,6 +361,8 @@ addJetCollection(
     svSource = cms.InputTag(svSource),
     muSource = cms.InputTag(muSource),
     elSource = cms.InputTag(elSource),
+    btagInfos = bTagInfos,
+    btagDiscriminators = bTagDiscriminators,
     jetCorrections = jetCorrectionsAK4,
     genJetCollection = cms.InputTag('genJetsNoNuSoftDrop8','SubJets'),
     genParticles = cms.InputTag(genParticles),
@@ -329,6 +384,8 @@ addJetCollection(
     labelName='PrunedPFCHS8',
     jetSource=cms.InputTag('PFJetsCHSPruned8'),
     algo=algoLabel,
+    btagInfos = ['None'],
+    btagDiscriminators = ['None'],
     jetCorrections=jetCorrectionsAK8,
     genJetCollection = cms.InputTag('genJetsNoNu8'),
     genParticles = cms.InputTag(genParticles),
@@ -346,6 +403,8 @@ addJetCollection(
     svSource = cms.InputTag(svSource),
     muSource = cms.InputTag(muSource),
     elSource = cms.InputTag(elSource),
+    btagInfos = bTagInfos,
+    btagDiscriminators = bTagDiscriminators,
     jetCorrections = jetCorrectionsAK4,
     genJetCollection = cms.InputTag('genJetsNoNuPruned8','SubJets'),
     genParticles = cms.InputTag(genParticles),
@@ -389,6 +448,8 @@ addJetCollection(
     svSource = cms.InputTag(svSource),
     muSource = cms.InputTag(muSource),
     elSource = cms.InputTag(elSource),
+    btagInfos = bTagInfos,
+    btagDiscriminators = bTagDiscriminators,
     jetCorrections = jetCorrectionsAK8,
     genJetCollection = cms.InputTag('genJetsNoNu15'),
     genParticles = cms.InputTag(genParticles),
@@ -401,6 +462,8 @@ addJetCollection(
     labelName='SoftDropPFCHS15',
     jetSource=cms.InputTag('PFJetsCHSSoftDrop15'),
     algo=algoLabel,
+    btagInfos = ['None'],
+    btagDiscriminators = ['None'],
     jetCorrections=jetCorrectionsAK8,
     genJetCollection = cms.InputTag('genJetsNoNu15'),
     genParticles = cms.InputTag(genParticles),
@@ -418,6 +481,8 @@ addJetCollection(
     svSource = cms.InputTag(svSource),
     muSource = cms.InputTag(muSource),
     elSource = cms.InputTag(elSource),
+    btagInfos = bTagInfos,
+    btagDiscriminators = bTagDiscriminators,
     jetCorrections = jetCorrectionsAK4,
     genJetCollection = cms.InputTag('genJetsNoNuSoftDrop15','SubJets'),
     genParticles = cms.InputTag(genParticles),
@@ -439,6 +504,8 @@ addJetCollection(
     labelName='PrunedPFCHS15',
     jetSource=cms.InputTag('PFJetsCHSPruned15'),
     algo=algoLabel,
+    btagInfos = ['None'],
+    btagDiscriminators = ['None'],
     jetCorrections=jetCorrectionsAK8,
     genJetCollection = cms.InputTag('genJetsNoNu15'),
     genParticles = cms.InputTag(genParticles),
@@ -456,6 +523,8 @@ addJetCollection(
     svSource = cms.InputTag(svSource),
     muSource = cms.InputTag(muSource),
     elSource = cms.InputTag(elSource),
+    btagInfos = bTagInfos,
+    btagDiscriminators = bTagDiscriminators,
     jetCorrections = jetCorrectionsAK4,
     genJetCollection = cms.InputTag('genJetsNoNuPruned15','SubJets'),
     genParticles = cms.InputTag(genParticles),
