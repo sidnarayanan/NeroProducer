@@ -10,9 +10,9 @@ class BareFatJets : virtual public BareP4
     public:
         BareFatJets();
         ~BareFatJets();
-        void clear();
-        void defineBranches(TTree *t);
-        virtual void setBranchAddresses(TTree*);
+        virtual void clear();
+        virtual void defineBranches(TTree *t, std::string prefix="fatjet");
+        virtual void setBranchAddresses(TTree* t, std::string prefix="fatjet");
         virtual inline string name(){return "BareFatJets";};
 
         // -- variables
@@ -31,7 +31,6 @@ class BareFatJets : virtual public BareP4
         TClonesArray  *subjets;
         vector<int>   *hasSubjet;
         vector<float> *subjetBtag;
-
 
 };
 

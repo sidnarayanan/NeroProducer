@@ -534,7 +534,7 @@ process.QGTagger.srcVertexCollection = cms.InputTag("offlineSlimmedPrimaryVertic
 process.QGTagger.useQualityCuts = cms.bool(False)
 ##----------------GLOBAL TAG ---------------------------
 # used by photon id and jets
-process.load("Configuration.StandardSequences.Geometry_cff")
+# process.load("Configuration.StandardSequences.Geometry_cff")
 process.load('Configuration.StandardSequences.Services_cff')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 #data
@@ -580,26 +580,39 @@ process.load('NeroProducer.Nero.Nero_cfi')
 process.load('NeroProducer.Nero.NeroMonotop_cfi')
 #process.load('NeroProducer.Nero.NeroChargedHiggs_cfi')
 
+from PhysicsTools.PatAlgos.tools.pfTools import *
+adaptPVs(process, pvCollection=cms.InputTag('offlineSlimmedPrimaryVertices'))
+
+## Add full JetFlavourInfo and TagInfos to PAT jets
+for r0 in ['8','15']:
+    for m in ['patJetsPFCHS'+r0, 'patJetsSoftDropSubjetsPFCHS'+r0, 'patJetsPrunedSubjetsPFCHS'+r0]:
+        if hasattr(process,m) and getattr( getattr(process,m), 'addBTagInfo' ):
+            print "Switching 'addTagInfos' for " + m + " to 'True'"
+            setattr( getattr(process,m), 'addTagInfos', cms.bool(True) )
+        if hasattr(process,m):
+            print "Switching 'addJetFlavourInfo' for " + m + " to 'True'"
+            setattr( getattr(process,m), 'addJetFlavourInfo', cms.bool(True) )
+
 #------------------------------------------------------
 process.p = cms.Path(
                 # process.dump*
 		        process.infoProducerSequence *
-                process.selectedPatJetsPFCHS8*
-                process.selectedPatJetsSoftDropPFCHS8*
-                process.selectedPatJetsSoftDropSubjetsPFCHS8*
-                process.selectedPatJetsSoftDropPFCHSPacked8*
-                process.selectedPatJetsPrunedPFCHS8*
-                process.selectedPatJetsPrunedSubjetsPFCHS8*
-                process.selectedPatJetsPrunedPFCHSPacked8*
-                process.packedPatJetsPFCHS8*
-                process.selectedPatJetsPFCHS15*
-                process.selectedPatJetsSoftDropPFCHS15*
-                process.selectedPatJetsSoftDropSubjetsPFCHS15*
-                process.selectedPatJetsSoftDropPFCHSPacked15*
-                process.selectedPatJetsPrunedPFCHS15*
-                process.selectedPatJetsPrunedSubjetsPFCHS15*
-                process.selectedPatJetsPrunedPFCHSPacked15*
-                process.packedPatJetsPFCHS15 *
+                # process.selectedPatJetsPFCHS8*
+                # process.selectedPatJetsSoftDropPFCHS8*
+                # process.selectedPatJetsSoftDropSubjetsPFCHS8*
+                # process.selectedPatJetsSoftDropPFCHSPacked8*
+                # process.selectedPatJetsPrunedPFCHS8*
+                # process.selectedPatJetsPrunedSubjetsPFCHS8*
+                # process.selectedPatJetsPrunedPFCHSPacked8*
+                # process.packedPatJetsPFCHS8*
+                # process.selectedPatJetsPFCHS15*
+                # process.selectedPatJetsSoftDropPFCHS15*
+                # process.selectedPatJetsSoftDropSubjetsPFCHS15*
+                # process.selectedPatJetsSoftDropPFCHSPacked15*
+                # process.selectedPatJetsPrunedPFCHS15*
+                # process.selectedPatJetsPrunedSubjetsPFCHS15*
+                # process.selectedPatJetsPrunedPFCHSPacked15*
+                # process.packedPatJetsPFCHS15 *
                 process.QGTagger *
                 process.egmGsfElectronIDSequence *
                 process.egmPhotonIDSequence *
@@ -607,3 +620,8 @@ process.p = cms.Path(
                 process.electronIDValueMapProducer * ## ISO MAP FOR PHOTONS
                 process.nero
                 )
+
+process.options = cms.untracked.PSet(
+        wantSummary = cms.untracked.bool(False),
+        allowUnscheduled = cms.untracked.bool(True)
+)

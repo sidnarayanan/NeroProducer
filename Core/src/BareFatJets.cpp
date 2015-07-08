@@ -39,45 +39,41 @@ void BareFatJets::clear(){
     hasSubjet->clear();
 }
 
-void BareFatJets::defineBranches(TTree *t){
+void BareFatJets::defineBranches(TTree *t, std::string prefix){
     //
-    BareP4::defineBranches(t, "fatjet" );
+    BareP4::defineBranches(t, "prefix" );
     //
+
     rawPt = new vector<float>;
-    t->Branch("fatjetRawPt","vector<float>",&rawPt);
-    // -- Jet Flavour by PAT
     flavour = new vector<int>;
-    t->Branch("fatjetFlavour","vector<int>",&flavour);
-    //
     tau1 = new vector<float>;
-    t->Branch("fatjetTau1","vector<float>",&tau1);
     tau2 = new vector<float>;
-    t->Branch("fatjetTau2","vector<float>",&tau2);
     tau3 = new vector<float>;
-    t->Branch("fatjetTau3","vector<float>",&tau3);
-
-    //
     trimmedMass = new vector<float>;
-    t->Branch("fatjetTrimmedMass","vector<float>",&trimmedMass);
     prunedMass = new vector<float>;
-    t->Branch("fatjetPrunedMass","vector<float>",&prunedMass);
     filteredMass = new vector<float>;
-    t->Branch("fatjetFilteredMass","vector<float>",&filteredMass);
     softdropMass = new vector<float>;
-    t->Branch("fatjetSoftdropMass","vector<float>",&softdropMass);
-
     subjets = new TClonesArray("TLorentzVector", 20);
-    t->Branch("subjets","TClonesArray", &subjets, 128000, 0);
-    hasSubjet =  new vector<int>;
-    t->Branch("hasSubjet","vector<int>",&hasSubjet);
-    subjetBtag =  new vector<float>;
-    t->Branch("subjetBtag","vector<float>",&subjetBtag);
+    hasSubjet = new vector<int>;
+    subjetBtag = new vector<float>;
+    t->Branch((prefix+string("_rawPt")).c_str(),"vector<float>",&rawPt);
+    t->Branch((prefix+string("_flavour")).c_str(),"vector<int>",&flavour);
+    t->Branch((prefix+string("_tau1")).c_str(),"vector<float>",&tau1);
+    t->Branch((prefix+string("_tau2")).c_str(),"vector<float>",&tau2);
+    t->Branch((prefix+string("_tau3")).c_str(),"vector<float>",&tau3);
+    t->Branch((prefix+string("_trimmedMass")).c_str(),"vector<float>",&trimmedMass);
+    t->Branch((prefix+string("_prunedMass")).c_str(),"vector<float>",&prunedMass);
+    t->Branch((prefix+string("_filteredMass")).c_str(),"vector<float>",&filteredMass);
+    t->Branch((prefix+string("_softdropMass")).c_str(),"vector<float>",&softdropMass);
+    t->Branch((prefix+string("_subjets")).c_str(),"TClonesArray",&subjets, 128000, 0);
+    t->Branch((prefix+string("_hasSubjet")).c_str(),"vector<int>",&hasSubjet);
+    t->Branch((prefix+string("_subjetBtag")).c_str(),"vector<float>",&subjetBtag);
 
 }
 
-void BareFatJets::setBranchAddresses(TTree *t){
+void BareFatJets::setBranchAddresses(TTree *t,string prefix){
     //
-    BareP4::setBranchAddresses(t,"fatjet");
+    BareP4::setBranchAddresses(t,prefix.c_str());
 
     rawPt = new vector<float>;
     // -- Jet Flavour by PAT
@@ -91,22 +87,23 @@ void BareFatJets::setBranchAddresses(TTree *t){
     prunedMass = new vector<float>;
     filteredMass = new vector<float>;
     softdropMass = new vector<float>;
-
-    t->SetBranchAddress("fatjetRawPt"	,&rawPt);
-    t->SetBranchAddress("fatjetFlavour" ,&flavour);
-    t->SetBranchAddress("fatjetTau1"	,&tau1);
-    t->SetBranchAddress("fatjetTau2"	,&tau2);
-    t->SetBranchAddress("fatjetTau3"	,&tau3);
-
-    t->SetBranchAddress("fatjetTrimmedMass"	,&trimmedMass);
-    t->SetBranchAddress("fatjetPrunedMass"	,&prunedMass);
-    t->SetBranchAddress("fatjetFilteredMass"	,&filteredMass);
-    t->SetBranchAddress("fatjetSoftdropMass"	,&softdropMass);
-
     subjets = new TClonesArray("TLorentzVector", 20);
-    t->SetBranchAddress("subjets"	,&subjets);
-    t->SetBranchAddress("hasSubjet",&hasSubjet);
-    t->SetBranchAddress("subjetBtag",&subjetBtag);
+    hasSubjet =  new vector<int>;
+    subjetBtag =  new vector<float>;
+
+    t->SetBranchAddress((prefix+string("_rawPt")).c_str(),&rawPt);
+    t->SetBranchAddress((prefix+string("_flavour")).c_str(),&flavour);
+    t->SetBranchAddress((prefix+string("_tau1")).c_str(),&tau1);
+    t->SetBranchAddress((prefix+string("_tau2")).c_str(),&tau2);
+    t->SetBranchAddress((prefix+string("_tau3")).c_str(),&tau3);
+    t->SetBranchAddress((prefix+string("_trimmedMass")).c_str(),&trimmedMass);
+    t->SetBranchAddress((prefix+string("_prunedMass")).c_str(),&prunedMass);
+    t->SetBranchAddress((prefix+string("_filteredMass")).c_str(),&filteredMass);
+    t->SetBranchAddress((prefix+string("_softdropMass")).c_str(),&softdropMass);
+    t->SetBranchAddress((prefix+string("_subjets")).c_str(),&subjets);
+    t->SetBranchAddress((prefix+string("_hasSubjet")).c_str(),&hasSubjet);
+    t->SetBranchAddress((prefix+string("_subjetBtag")).c_str(),&subjetBtag);
+
 }
 // Local Variables:
 // mode:c++

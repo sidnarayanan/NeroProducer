@@ -24,6 +24,10 @@ class NeroFatJets : virtual public NeroCollection,
       ~NeroFatJets();
       int analyze(const edm::Event& iEvent);
       virtual inline string name(){return "NeroFatJets";};
+      void setBranchAddresses(TTree *);
+      void defineBranches(TTree *);
+      void clear();
+
 
       // --- specific fuctions
       // --- Handle
@@ -32,6 +36,8 @@ class NeroFatJets : virtual public NeroCollection,
 
       // --- Token
       edm::EDGetTokenT<pat::JetCollection> token;
+
+      void SetPrefix(std::string n)       { prefix = n;         }
 
       void SetSubjetsName (std::string n) { SubjetsName = n;    }
       std::string GetSubjetsName()        { return SubjetsName; }
@@ -53,6 +59,10 @@ class NeroFatJets : virtual public NeroCollection,
     protected:
       std::string SubjetsName = "SubJets";
       float R0                = -1;
+      fastjet::contrib::Njettiness njettiness;
+      std::string prefix = "fatjet";
+      
+
       std::vector<float> *tau1IVF;
       std::vector<float> *tau2IVF;
       std::vector<unsigned int> *nSV;
@@ -62,7 +72,6 @@ class NeroFatJets : virtual public NeroCollection,
       std::vector<float> *svEnergyRatio0;
       std::vector<float> *svEnergyRatio1;
       std::vector<float> *svPt0;
-      fastjet::contrib::Njettiness njettiness;
 
 
 

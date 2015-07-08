@@ -5,6 +5,7 @@ process = cms.Process("SKIM")
 
 process.load("FWCore.MessageService.MessageLogger_cfi")
 process.MessageLogger.cerr.FwkReport.reportEvery = cms.untracked.int32(10000)
+process.dump=cms.EDAnalyzer('EventContentAnalyzer')
 
 
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
@@ -35,22 +36,28 @@ process.outPut = cms.OutputModule("PoolOutputModule",
                                   outputCommands = cms.untracked.vstring(
         "keep *",
         "drop *_*_*_SKIM",
+        "keep recoPFJets_PFJetsCHS8_*_*",
         "keep patJets_selectedPatJetsPFCHS8_*_*",
         "keep patJets_packedPatJetsPFCHS8_*_*",
-        "keep patJets_selectedPatJetsPFCHS15_*_*",
-        "keep patJets_packedPatJetsPFCHS15_*_*",
         "keep patJets_selectedPatJetsSoftDropPFCHS8_*_*",
         "keep patJets_selectedPatJetsSoftDropSubjetsPFCHS8_*_*",
         "keep patJets_selectedPatJetsSoftDropPFCHSPacked8_*_*",
         "keep patJets_selectedPatJetsPrunedPFCHS8_*_*",
         "keep patJets_selectedPatJetsPrunedSubjetsPFCHS8_*_*",
         "keep patJets_selectedPatJetsPrunedPFCHSPacked8_*_*",
+        "keep recoPFJets_PFJetsCHS15 _*_*",
+        "keep patJets_selectedPatJetsPFCHS15_*_*",
+        "keep patJets_packedPatJetsPFCHS15_*_*",
         "keep patJets_selectedPatJetsSoftDropPFCHS15_*_*",
-        "keep patJets_selectedPatJetsSoftDropSubjetsPFCHS158_*_*",
+        "keep patJets_selectedPatJetsSoftDropSubjetsPFCHS15_*_*",
         "keep patJets_selectedPatJetsSoftDropPFCHSPacked15_*_*",
         "keep patJets_selectedPatJetsPrunedPFCHS15_*_*",
         "keep patJets_selectedPatJetsPrunedSubjetsPFCHS15_*_*",
         "keep patJets_selectedPatJetsPrunedPFCHSPacked15_*_*",
+        "keep *_pfInclusiveSecondaryVertexFinderTagInfosPFCHS15_*_*",
+        "keep *_pfInclusiveSecondaryVertexFinderTagInfosPFCHS8_*_*",
+        "keep *_pfImpactParameterTagInfosPFCHS15_*_*",
+        "keep *_pfImpactParameterTagInfosPFCHS8_*_*",
         "keep *_skimmedMETs_*_SKIM"
         ),
                                   fileName = cms.untracked.string("skim.root")
@@ -119,10 +126,6 @@ process.ak4GenJetsNoNu = ak4GenJets.clone(src = 'packedGenParticlesForJetsNoNu')
 
 process.ak4PFJets = ak4PFJets.clone(src = 'pfNoElectronsCHS', doAreaFastjet = True)
 
-## Load standard PAT objects (here we only need PAT muons but the framework will figure out what it needs to run using the unscheduled mode)
-process.load("PhysicsTools.PatAlgos.producersLayer1.patCandidates_cff")
-process.load("PhysicsTools.PatAlgos.selectionLayer1.selectedPatCandidates_cff")
-
 
 bTagInfos = [
     'pfImpactParameterTagInfos'
@@ -161,6 +164,9 @@ bTagDiscriminators = [
     ,'negativeSoftPFElectronBJetTags'
 ]
 
+## Load standard PAT objects (here we only need PAT muons but the framework will figure out what it needs to run using the unscheduled mode)
+process.load("PhysicsTools.PatAlgos.producersLayer1.patCandidates_cff")
+process.load("PhysicsTools.PatAlgos.selectionLayer1.selectedPatCandidates_cff")
 
 from PhysicsTools.PatAlgos.tools.jetTools import *
 ## Switch the default jet collection (done in order to use the above specified b-tag infos and discriminators)
@@ -555,6 +561,20 @@ process.packedPatJetsPFCHS15.algoLabels.append( 'SoftDrop' )
 process.packedPatJetsPFCHS15.algoTags.append( cms.InputTag('selectedPatJetsPrunedPFCHSPacked15') )
 process.packedPatJetsPFCHS15.algoLabels.append( 'Pruned' )
 
+from PhysicsTools.PatAlgos.tools.pfTools import *
+adaptPVs(process, pvCollection=cms.InputTag('offlineSlimmedPrimaryVertices'))
+
+## Add full JetFlavourInfo and TagInfos to PAT jets
+for r0 in ['8','15']:
+    for m in ['patJetsPFCHS'+r0, 'patJetsSoftDropSubjetsPFCHS'+r0, 'patJetsPrunedSubjetsPFCHS'+r0]:
+        if hasattr(process,m) and getattr( getattr(process,m), 'addBTagInfo' ):
+            print "Switching 'addTagInfos' for " + m + " to 'True'"
+            setattr( getattr(process,m), 'addTagInfos', cms.bool(True) )
+        if hasattr(process,m):
+            print "Switching 'addJetFlavourInfo' for " + m + " to 'True'"
+            setattr( getattr(process,m), 'addJetFlavourInfo', cms.bool(True) )
+
+
 
 ##############################################
 ## RUN
@@ -577,10 +597,8 @@ process.p = cms.Path(
                      process.selectedPatJetsPrunedSubjetsPFCHS15*
                      process.selectedPatJetsPrunedPFCHSPacked15*
                      process.packedPatJetsPFCHS15
+                    #  *process.dump
                      )
-
-from PhysicsTools.PatAlgos.tools.pfTools import *
-adaptPVs(process, pvCollection=cms.InputTag('offlineSlimmedPrimaryVertices'))
 
 process.options = cms.untracked.PSet(
         wantSummary = cms.untracked.bool(False),

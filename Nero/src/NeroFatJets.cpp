@@ -43,12 +43,82 @@
 
 NeroFatJets::NeroFatJets(double r0) : BareFatJets(),
                              R0(r0),
-                             njettiness(fastjet::contrib::OnePass_KT_Axes(), fastjet::contrib::NormalizedMeasure(1.0,R0))
+                             njettiness(fastjet::contrib::OnePass_KT_Axes(), fastjet::contrib::NormalizedMeasure(1.0,R0)),
+                             tau1IVF(0),
+                             tau2IVF(0),
+                             nSV(0),
+                             zRatio(0),
+                             tauDot(0),
+                             svMass0(0),
+                             svEnergyRatio0(0),
+                             svEnergyRatio1(0),
+                             svPt0(0)
 {
 }
 
 NeroFatJets::~NeroFatJets(){
 }
+
+void NeroFatJets::clear() {
+  BareFatJets::clear();
+  tau1IVF->clear();
+  tau2IVF->clear();
+  nSV->clear();
+  zRatio->clear();
+  tauDot->clear();
+  svMass0->clear();
+  svEnergyRatio0->clear();
+  svEnergyRatio1->clear();
+  svPt0->clear();
+}
+
+void NeroFatJets::defineBranches(TTree * t){
+  BareFatJets::defineBranches(t,prefix);
+  tau1IVF = new vector<float>;
+  tau2IVF = new vector<float>;
+  nSV = new vector<unsigned int>;
+  zRatio = new vector<float>;
+  tauDot = new vector<float>;
+  svMass0 = new vector<float>;
+  svEnergyRatio0 = new vector<float>;
+  svEnergyRatio1 = new vector<float>;
+  svPt0 = new vector<float>;
+  t->Branch((prefix+string("_tau1IVF")).c_str(),"vector<float>",&tau1IVF);
+  t->Branch((prefix+string("_tau2IVF")).c_str(),"vector<float>",&tau2IVF);
+  t->Branch((prefix+string("_nSV")).c_str(),"vector<unsigned int>",&nSV);
+  t->Branch((prefix+string("_zRatio")).c_str(),"vector<float>",&zRatio);
+  t->Branch((prefix+string("_tauDot")).c_str(),"vector<float>",&tauDot);
+  t->Branch((prefix+string("_svMass0")).c_str(),"vector<float>",&svMass0);
+  t->Branch((prefix+string("_svEnergyRatio0")).c_str(),"vector<float>",&svEnergyRatio0);
+  t->Branch((prefix+string("_svEnergyRatio1")).c_str(),"vector<float>",&svEnergyRatio1);
+  t->Branch((prefix+string("_svPt0")).c_str(),"vector<float>",&svPt0);
+
+}
+
+void NeroFatJets::setBranchAddresses(TTree *t){
+  //
+  BareFatJets::setBranchAddresses(t,prefix);
+  tau1IVF = new vector<float>;
+  tau2IVF = new vector<float>;
+  nSV = new vector<unsigned int>;
+  zRatio = new vector<float>;
+  tauDot = new vector<float>;
+  svMass0 = new vector<float>;
+  svEnergyRatio0 = new vector<float>;
+  svEnergyRatio1 = new vector<float>;
+  svPt0 = new vector<float>;
+  t->SetBranchAddress((prefix+string("_tau1IVF")).c_str(),&tau1IVF);
+  t->SetBranchAddress((prefix+string("_tau2IVF")).c_str(),&tau2IVF);
+  t->SetBranchAddress((prefix+string("_nSV")).c_str(),&nSV);
+  t->SetBranchAddress((prefix+string("_zRatio")).c_str(),&zRatio);
+  t->SetBranchAddress((prefix+string("_tauDot")).c_str(),&tauDot);
+  t->SetBranchAddress((prefix+string("_svMass0")).c_str(),&svMass0);
+  t->SetBranchAddress((prefix+string("_svEnergyRatio0")).c_str(),&svEnergyRatio0);
+  t->SetBranchAddress((prefix+string("_svEnergyRatio1")).c_str(),&svEnergyRatio1);
+  t->SetBranchAddress((prefix+string("_svPt0")).c_str(),&svPt0);
+
+}
+
 
 int NeroFatJets::analyze(const edm::Event& iEvent){
 
@@ -67,9 +137,6 @@ int NeroFatJets::analyze(const edm::Event& iEvent){
         // JET ID
         if ( !NeroJets::JetId(j,"loose") ) continue;
 
-        // B Tagging
-        doBTagging(&j);
-
         // GET  ValueMaps
 
         // Fill output object
@@ -81,6 +148,9 @@ int NeroFatJets::analyze(const edm::Event& iEvent){
         tau1 -> push_back(j.userFloat("Njettiness:tau1"));
         tau2 -> push_back(j.userFloat("Njettiness:tau2"));
         tau3 -> push_back(j.userFloat("Njettiness:tau3"));
+
+        // B Tagging
+        doBTagging(&j);
 
         trimmedMass ->push_back(j.userFloat("PFJetsCHSTrimmedMass"));
         prunedMass  ->push_back(j.userFloat("PFJetsCHSPrunedMass"));
@@ -102,12 +172,20 @@ int NeroFatJets::analyze(const edm::Event& iEvent){
 void NeroFatJets::doBTagging(const pat::Jet* jet) {
   const IPTagInfo * ipTagInfo = jet->tagInfoCandIP("pfImpactParameter");
   const SVTagInfo * svTagInfo = jet->tagInfoCandSecondaryVertex("pfInclusiveSecondaryVertexFinder");
+  // const std::vector<std::string>  tagInfoLabels = jet->tagInfoLabels();
+  // printf("==================================================\n");
+  // for (auto & label : tagInfoLabels) {
+  //   printf("label %s\n",label.c_str());
+  // }
+  // printf("svTagInfo = %p; ipTagInfo = %p\n",svTagInfo,ipTagInfo);
+  // printf("==================================================\n");
 
   std::vector<fastjet::PseudoJet> currentAxes;
   float tau1IVF_tmp = tau1->back();
   float tau2IVF_tmp = tau2->back();
   recalcNsubjettiness(*jet,*svTagInfo,tau1IVF_tmp,tau2IVF_tmp,currentAxes);
   tau1IVF->push_back(tau1IVF_tmp);
+  // printf("wolf fence\n"); exit(-1);
   tau2IVF->push_back(tau2IVF_tmp);
 
   const Tracks & selectedTracks( ipTagInfo->selectedTracks() );
