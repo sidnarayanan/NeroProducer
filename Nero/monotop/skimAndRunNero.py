@@ -194,6 +194,14 @@ process.PFJetsCHSPruned8 = ak4PFJetsPruned.clone(
     jetCollInstanceName=cms.string("SubJets"),
     jetPtMin = cms.double(250)
 )
+process.PFJetsCHSTrimmed8 = PFJetsCHS8.clone(
+    useTrimming         = cms.bool(True),
+    rFilt               = cms.double(0.2),
+    trimPtFracMin       = cms.double(0.06),
+    useExplicitGhosts   = cms.bool(True),
+    writeCompound       = cms.bool(True),
+    jetCollInstanceName = cms.string("SubJets")
+)
 ## SoftDrop fat jets (Gen and Reco) (each module produces two jet collections, fat jets and subjets)
 process.genJetsNoNuSoftDrop8 = ak4GenJets.clone(
     jetAlgorithm = cms.string(jetAlgo),
@@ -258,6 +266,22 @@ process.PFJetsCHSPruned15 = ak4PFJetsPruned.clone(
     jetCollInstanceName=cms.string("SubJets"),
     jetPtMin = cms.double(250)
 )
+process.genJetsNoNuTrimmed15 = genJetsNoNu15.clone(
+    useTrimming         = cms.bool(True),
+    rFilt               = cms.double(0.2),
+    trimPtFracMin       = cms.double(0.06),
+    useExplicitGhosts   = cms.bool(True),
+    writeCompound       = cms.bool(True),
+    jetCollInstanceName = cms.string("SubJets")
+)
+process.PFJetsCHSTrimmed15 = PFJetsCHS15.clone(
+    useTrimming         = cms.bool(True),
+    rFilt               = cms.double(0.2),
+    trimPtFracMin       = cms.double(0.06),
+    useExplicitGhosts   = cms.bool(True),
+    writeCompound       = cms.bool(True),
+    jetCollInstanceName = cms.string("SubJets")
+)
 ## SoftDrop fat jets (Gen and Reco) (each module produces two jet collections, fat jets and subjets)
 process.genJetsNoNuSoftDrop15 = ak4GenJets.clone(
     jetAlgorithm = cms.string(jetAlgo),
@@ -310,8 +334,8 @@ getattr(process,'selectedPatJetsPFCHS8').cut = cms.string("abs(eta) < " + str(2.
 
 addJetCollection(
     process,
-    jetSource=cms.InputTag('PFJetsCHSSoftDrop8'),
     labelName='SoftDropPFCHS8',
+    jetSource=cms.InputTag('PFJetsCHSSoftDrop8'),
     algo=algoLabel,
     btagInfos = ['None'],
     btagDiscriminators = ['None'],
@@ -348,6 +372,48 @@ addJetCollection(
 process.selectedPatJetsSoftDropPFCHSPacked8 = cms.EDProducer("BoostedJetMerger",
     jetSrc=cms.InputTag("selectedPatJetsSoftDropPFCHS8"),
     subjetSrc=cms.InputTag("selectedPatJetsSoftDropSubjetsPFCHS8")
+)
+
+addJetCollection(
+    process,
+    labelName='TrimmedPFCHS8',
+    jetSource=cms.InputTag('PFJetsCHSTrimmed8'),
+    algo=algoLabel,
+    btagInfos = ['None'],
+    btagDiscriminators = ['None'],
+    jetCorrections=jetCorrectionsAK8,
+    genJetCollection = cms.InputTag('genJetsNoNu8'),
+    genParticles = cms.InputTag(genParticles),
+    getJetMCFlavour = False, # jet flavor disabled
+    # postfix = postfix
+)
+addJetCollection(
+    process,
+    labelName='TrimmedSubjetsPFCHS8',
+    jetSource=cms.InputTag('PFJetsCHSTrimmed8','SubJets'),
+    algo=algoLabel,           # needed for subjet flavor clustering
+    rParam=.8, # needed for subjet flavor clustering
+    pfCandidates = cms.InputTag(pfCandidates),
+    pvSource = cms.InputTag(pvSource),
+    svSource = cms.InputTag(svSource),
+    muSource = cms.InputTag(muSource),
+    elSource = cms.InputTag(elSource),
+    btagInfos = bTagInfos,
+    btagDiscriminators = bTagDiscriminators,
+    jetCorrections = jetCorrectionsAK4,
+    genJetCollection = cms.InputTag('genJetsNoNuTrimmed8','SubJets'),
+    genParticles = cms.InputTag(genParticles),
+    explicitJTA = True,  # needed for subjet b tagging
+    svClustering = True, # needed for subjet b tagging
+    fatJets = cms.InputTag('PFJetsCHS8'),              # needed for subjet flavor clustering
+    groomedFatJets = cms.InputTag('PFJetsCHSTrimmed8'), # needed for subjet flavor clustering
+    runIVF = False,
+    # postfix = postfix
+)
+## Establish references between PATified fat jets and subjets using the BoostedJetMerger
+process.selectedPatJetsSoftDropPFCHSPacked8 = cms.EDProducer("BoostedJetMerger",
+    jetSrc=cms.InputTag("selectedPatJetsTrimmedPFCHS8"),
+    subjetSrc=cms.InputTag("selectedPatJetsTrimmedSubjetsPFCHS8")
 )
 
 addJetCollection(
@@ -405,6 +471,8 @@ process.packedPatJetsPFCHS8.algoTags.append( cms.InputTag('selectedPatJetsSoftDr
 process.packedPatJetsPFCHS8.algoLabels.append( 'SoftDrop' )
 process.packedPatJetsPFCHS8.algoTags.append( cms.InputTag('selectedPatJetsPrunedPFCHSPacked8') )
 process.packedPatJetsPFCHS8.algoLabels.append( 'Pruned' )
+process.packedPatJetsPFCHS8.algoTags.append( cms.InputTag('selectedPatJetsTrimmedPFCHSPacked8') )
+process.packedPatJetsPFCHS8.algoLabels.append( 'Trimmed' )
 
 ##
 
@@ -472,6 +540,49 @@ process.selectedPatJetsSoftDropPFCHSPacked15 = cms.EDProducer("BoostedJetMerger"
 
 addJetCollection(
     process,
+    labelName='TrimmedPFCHS15',
+    jetSource=cms.InputTag('PFJetsCHSTrimmed15'),
+    algo=algoLabel,
+    btagInfos = ['None'],
+    btagDiscriminators = ['None'],
+    jetCorrections=jetCorrectionsAK8,
+    genJetCollection = cms.InputTag('genJetsNoNu15'),
+    genParticles = cms.InputTag(genParticles),
+    getJetMCFlavour = False, # jet flavor disabled
+    # postfix = postfix
+)
+addJetCollection(
+    process,
+    labelName='TrimmedSubjetsPFCHS15',
+    jetSource=cms.InputTag('PFJetsCHSTrimmed15','SubJets'),
+    algo=algoLabel,           # needed for subjet flavor clustering
+    rParam=1.5, # needed for subjet flavor clustering
+    pfCandidates = cms.InputTag(pfCandidates),
+    pvSource = cms.InputTag(pvSource),
+    svSource = cms.InputTag(svSource),
+    muSource = cms.InputTag(muSource),
+    elSource = cms.InputTag(elSource),
+    btagInfos = bTagInfos,
+    btagDiscriminators = bTagDiscriminators,
+    jetCorrections = jetCorrectionsAK4,
+    genJetCollection = cms.InputTag('genJetsNoNuTrimmed15','SubJets'),
+    genParticles = cms.InputTag(genParticles),
+    explicitJTA = True,  # needed for subjet b tagging
+    svClustering = True, # needed for subjet b tagging
+    fatJets = cms.InputTag('PFJetsCHS15'),              # needed for subjet flavor clustering
+    groomedFatJets = cms.InputTag('PFJetsCHSTrimmed15'), # needed for subjet flavor clustering
+    runIVF = False,
+    # postfix = postfix
+)
+
+## Establish references between PATified fat jets and subjets using the BoostedJetMerger
+process.selectedPatJetsPrunedPFCHSPacked15 = cms.EDProducer("BoostedJetMerger",
+    jetSrc=cms.InputTag("selectedPatJetsTrimmedPFCHS15"),
+    subjetSrc=cms.InputTag("selectedPatJetsTrimmedSubjetsPFCHS15")
+)
+
+addJetCollection(
+    process,
     labelName='PrunedPFCHS15',
     jetSource=cms.InputTag('PFJetsCHSPruned15'),
     algo=algoLabel,
@@ -525,6 +636,8 @@ process.packedPatJetsPFCHS15.algoTags.append( cms.InputTag('selectedPatJetsSoftD
 process.packedPatJetsPFCHS15.algoLabels.append( 'SoftDrop' )
 process.packedPatJetsPFCHS15.algoTags.append( cms.InputTag('selectedPatJetsPrunedPFCHSPacked15') )
 process.packedPatJetsPFCHS15.algoLabels.append( 'Pruned' )
+process.packedPatJetsPFCHS15.algoTags.append( cms.InputTag('selectedPatJetsTrimedPFCHSPacked15') )
+process.packedPatJetsPFCHS15.algoLabels.append( 'Trimmed' )
 
 
 # ------------------------QG-----------------------------------------------
