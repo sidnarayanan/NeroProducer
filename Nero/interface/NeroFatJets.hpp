@@ -61,7 +61,7 @@ class NeroFatJets : virtual public NeroCollection,
       float R0                = -1;
       fastjet::contrib::Njettiness njettiness;
       std::string prefix = "fatjet";
-      
+
 
       std::vector<float> *tau1IVF;
       std::vector<float> *tau2IVF;
@@ -72,8 +72,18 @@ class NeroFatJets : virtual public NeroCollection,
       std::vector<float> *svEnergyRatio0;
       std::vector<float> *svEnergyRatio1;
       std::vector<float> *svPt0;
-
-
+      std::vector<float> *prunedPt;
+      std::vector<float> *prunedEta;
+      std::vector<float> *prunedPhi;
+      std::vector<float> *prunedJEC0;
+      std::vector<float> *trimmedPt;
+      std::vector<float> *trimmedEta;
+      std::vector<float> *trimmedPhi;
+      std::vector<float> *trimmedJEC0;
+      std::vector<float> *sdPt;
+      std::vector<float> *sdEta;
+      std::vector<float> *sdPhi;
+      std::vector<float> *sdJEC0;
 
 };
 

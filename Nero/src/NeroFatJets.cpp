@@ -70,6 +70,18 @@ void NeroFatJets::clear() {
   svEnergyRatio0->clear();
   svEnergyRatio1->clear();
   svPt0->clear();
+  prunedPt->clear();
+  prunedEta->clear();
+  prunedPhi->clear();
+  prunedJEC0->clear();
+  trimmedPt->clear();
+  trimmedEta->clear();
+  trimmedPhi->clear();
+  trimmedJEC0->clear();
+  sdPt->clear();
+  sdEta->clear();
+  sdPhi->clear();
+  sdJEC0->clear();
 }
 
 void NeroFatJets::defineBranches(TTree * t){
@@ -83,6 +95,19 @@ void NeroFatJets::defineBranches(TTree * t){
   svEnergyRatio0 = new vector<float>;
   svEnergyRatio1 = new vector<float>;
   svPt0 = new vector<float>;
+  prunedPt = new vector<float>;
+  prunedEta = new vector<float>;
+  prunedPhi = new vector<float>;
+  prunedJEC0 = new vector<float>;
+  trimmedPt = new vector<float>;
+  trimmedEta = new vector<float>;
+  trimmedPhi = new vector<float>;
+  trimmedJEC0 = new vector<float>;
+  sdPt = new vector<float>;
+  sdEta = new vector<float>;
+  sdPhi = new vector<float>;
+  sdJEC0 = new vector<float>;
+
   t->Branch((prefix+string("_tau1IVF")).c_str(),"vector<float>",&tau1IVF);
   t->Branch((prefix+string("_tau2IVF")).c_str(),"vector<float>",&tau2IVF);
   t->Branch((prefix+string("_nSV")).c_str(),"vector<unsigned int>",&nSV);
@@ -92,6 +117,18 @@ void NeroFatJets::defineBranches(TTree * t){
   t->Branch((prefix+string("_svEnergyRatio0")).c_str(),"vector<float>",&svEnergyRatio0);
   t->Branch((prefix+string("_svEnergyRatio1")).c_str(),"vector<float>",&svEnergyRatio1);
   t->Branch((prefix+string("_svPt0")).c_str(),"vector<float>",&svPt0);
+  t->Branch((prefix+string("_prunedPt")).c_str(),"vector<float>",&prunedPt);
+  t->Branch((prefix+string("_prunedEta")).c_str(),"vector<float>",&prunedEta);
+  t->Branch((prefix+string("_prunedPhi")).c_str(),"vector<float>",&prunedPhi);
+  t->Branch((prefix+string("_prunedJEC0")).c_str(),"vector<float>",&prunedJEC0);
+  t->Branch((prefix+string("_trimmedPt")).c_str(),"vector<float>",&trimmedPt);
+  t->Branch((prefix+string("_trimmedEta")).c_str(),"vector<float>",&trimmedEta);
+  t->Branch((prefix+string("_trimmedPhi")).c_str(),"vector<float>",&trimmedPhi);
+  t->Branch((prefix+string("_trimmedJEC0")).c_str(),"vector<float>",&trimmedJEC0);
+  t->Branch((prefix+string("_sdPt")).c_str(),"vector<float>",&sdPt);
+  t->Branch((prefix+string("_sdEta")).c_str(),"vector<float>",&sdEta);
+  t->Branch((prefix+string("_sdPhi")).c_str(),"vector<float>",&sdPhi);
+  t->Branch((prefix+string("_sdJEC0")).c_str(),"vector<float>",&sdJEC0);
 
 }
 
@@ -107,6 +144,19 @@ void NeroFatJets::setBranchAddresses(TTree *t){
   svEnergyRatio0 = new vector<float>;
   svEnergyRatio1 = new vector<float>;
   svPt0 = new vector<float>;
+  prunedPt = new vector<float>;
+  prunedEta = new vector<float>;
+  prunedPhi = new vector<float>;
+  prunedJEC0 = new vector<float>;
+  trimmedPt = new vector<float>;
+  trimmedEta = new vector<float>;
+  trimmedPhi = new vector<float>;
+  trimmedJEC0 = new vector<float>;
+  sdPt = new vector<float>;
+  sdEta = new vector<float>;
+  sdPhi = new vector<float>;
+  sdJEC0 = new vector<float>;
+
   t->SetBranchAddress((prefix+string("_tau1IVF")).c_str(),&tau1IVF);
   t->SetBranchAddress((prefix+string("_tau2IVF")).c_str(),&tau2IVF);
   t->SetBranchAddress((prefix+string("_nSV")).c_str(),&nSV);
@@ -116,6 +166,18 @@ void NeroFatJets::setBranchAddresses(TTree *t){
   t->SetBranchAddress((prefix+string("_svEnergyRatio0")).c_str(),&svEnergyRatio0);
   t->SetBranchAddress((prefix+string("_svEnergyRatio1")).c_str(),&svEnergyRatio1);
   t->SetBranchAddress((prefix+string("_svPt0")).c_str(),&svPt0);
+  t->SetBranchAddress((prefix+string("_prunedPt")).c_str(),&prunedPt);
+  t->SetBranchAddress((prefix+string("_prunedEta")).c_str(),&prunedEta);
+  t->SetBranchAddress((prefix+string("_prunedPhi")).c_str(),&prunedPhi);
+  t->SetBranchAddress((prefix+string("_prunedJEC0")).c_str(),&prunedJEC0);
+  t->SetBranchAddress((prefix+string("_trimmedPt")).c_str(),&trimmedPt);
+  t->SetBranchAddress((prefix+string("_trimmedEta")).c_str(),&trimmedEta);
+  t->SetBranchAddress((prefix+string("_trimmedPhi")).c_str(),&trimmedPhi);
+  t->SetBranchAddress((prefix+string("_trimmedJEC0")).c_str(),&trimmedJEC0);
+  t->SetBranchAddress((prefix+string("_sdPt")).c_str(),&sdPt);
+  t->SetBranchAddress((prefix+string("_sdEta")).c_str(),&sdEta);
+  t->SetBranchAddress((prefix+string("_sdPhi")).c_str(),&sdPhi);
+  t->SetBranchAddress((prefix+string("_sdJEC0")).c_str(),&sdJEC0);
 
 }
 
@@ -157,6 +219,25 @@ int NeroFatJets::analyze(const edm::Event& iEvent){
         filteredMass->push_back(j.userFloat("PFJetsCHSFilteredMass"));
         softdropMass->push_back(j.userFloat("PFJetsCHSSoftDropMass"));
         hasSubjet->push_back(j.hasSubjets(SubjetsName));
+
+        // get groomed jet infos
+        TString sR0 = TString::Format("%i",int(R0*10));
+        TString sPt(":Pt");  TString sEta(":Eta");  TString sPhi(":Phi"); TString sJEC0(":jecFactor0");
+        TString sPruned = TString("Pruned") + sR0;
+        TString sTrimmed = TString("Trimmed") + sR0;
+        TString sSD = TString("SoftDrop") + sR0;
+        prunedPt->push_back(j.userFloat( (sPruned+sPt).Data() ));
+        prunedEta->push_back(j.userFloat( (sPruned+sEta).Data() ));
+        prunedPhi->push_back(j.userFloat( (sPruned+sPhi).Data() ));
+        prunedJEC0->push_back(j.userFloat( (sPruned+sJEC0).Data() ));
+        trimmedPt->push_back(j.userFloat( (sTrimmed+sPt).Data() ));
+        trimmedEta->push_back(j.userFloat( (sTrimmed+sEta).Data() ));
+        trimmedPhi->push_back(j.userFloat( (sTrimmed+sPhi).Data() ));
+        trimmedJEC0->push_back(j.userFloat( (sTrimmed+sJEC0).Data() ));
+        sdPt->push_back(j.userFloat( (sSD+sPt).Data() ));
+        sdEta->push_back(j.userFloat( (sSD+sEta).Data() ));
+        sdPhi->push_back(j.userFloat( (sSD+sPhi).Data() ));
+        sdJEC0->push_back(j.userFloat( (sSD+sJEC0).Data() ));
 
         auto Subjets = j.subjets(SubjetsName);
         for ( auto const & i : Subjets ) {
