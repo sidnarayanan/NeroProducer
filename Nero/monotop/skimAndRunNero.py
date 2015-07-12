@@ -194,7 +194,15 @@ process.PFJetsCHSPruned8 = ak4PFJetsPruned.clone(
     jetCollInstanceName=cms.string("SubJets"),
     jetPtMin = cms.double(250)
 )
-process.PFJetsCHSTrimmed8 = PFJetsCHS8.clone(
+process.genJetsNoNuTrimmed8 = process.genJetsNoNu8.clone(
+    useTrimming         = cms.bool(True),
+    rFilt               = cms.double(0.2),
+    trimPtFracMin       = cms.double(0.06),
+    useExplicitGhosts   = cms.bool(True),
+    writeCompound       = cms.bool(True),
+    jetCollInstanceName = cms.string("SubJets")
+)
+process.PFJetsCHSTrimmed8 = process.PFJetsCHS8.clone(
     useTrimming         = cms.bool(True),
     rFilt               = cms.double(0.2),
     trimPtFracMin       = cms.double(0.06),
@@ -266,7 +274,7 @@ process.PFJetsCHSPruned15 = ak4PFJetsPruned.clone(
     jetCollInstanceName=cms.string("SubJets"),
     jetPtMin = cms.double(250)
 )
-process.genJetsNoNuTrimmed15 = genJetsNoNu15.clone(
+process.genJetsNoNuTrimmed15 = process.genJetsNoNu15.clone(
     useTrimming         = cms.bool(True),
     rFilt               = cms.double(0.2),
     trimPtFracMin       = cms.double(0.06),
@@ -274,7 +282,7 @@ process.genJetsNoNuTrimmed15 = genJetsNoNu15.clone(
     writeCompound       = cms.bool(True),
     jetCollInstanceName = cms.string("SubJets")
 )
-process.PFJetsCHSTrimmed15 = PFJetsCHS15.clone(
+process.PFJetsCHSTrimmed15 = process.PFJetsCHS15.clone(
     useTrimming         = cms.bool(True),
     rFilt               = cms.double(0.2),
     trimPtFracMin       = cms.double(0.06),
@@ -411,7 +419,7 @@ addJetCollection(
     # postfix = postfix
 )
 ## Establish references between PATified fat jets and subjets using the BoostedJetMerger
-process.selectedPatJetsSoftDropPFCHSPacked8 = cms.EDProducer("BoostedJetMerger",
+process.selectedPatJetsTrimmedPFCHSPacked8 = cms.EDProducer("BoostedJetMerger",
     jetSrc=cms.InputTag("selectedPatJetsTrimmedPFCHS8"),
     subjetSrc=cms.InputTag("selectedPatJetsTrimmedSubjetsPFCHS8")
 )
@@ -474,7 +482,6 @@ process.packedPatJetsPFCHS8.algoLabels.append( 'Pruned' )
 process.packedPatJetsPFCHS8.algoTags.append( cms.InputTag('selectedPatJetsTrimmedPFCHSPacked8') )
 process.packedPatJetsPFCHS8.algoLabels.append( 'Trimmed' )
 
-
 process.SoftDrop8 = cms.EDProducer("RecoJetDeltaRValueMapProducer",
     src = cms.InputTag("PFJetsCHS8"),
     matched = cms.InputTag("selectedPatJetsSoftDropPFCHSPacked8"),
@@ -500,9 +507,9 @@ process.Pruned8 = cms.EDProducer("RecoJetDeltaRValueMapProducer",
     lazyParser = cms.bool(True)
 )
 
-getattr(process,'patJetsPFCHS8').userData.userFloats.src += ['SoftDrop:Mass','SoftDrop:Pt','SoftDrop:Eta','SoftDrop:Phi','SoftDrop:jecFactor0',
-                                                                    'Pruned:Mass'  ,'Pruned:Pt'  ,'Pruned:Eta'  ,'Pruned:Phi'  ,'Pruned:jecFactor0',
-                                                                    'Trimmed:Mass', 'Trimmed:Pt', 'Trimmed:Eta', 'Trimmed:Phi', 'Trimmed:jecFactor0']
+getattr(process,'patJetsPFCHS8').userData.userFloats.src += ['SoftDrop8:Mass','SoftDrop8:Pt','SoftDrop8:Eta','SoftDrop8:Phi','SoftDrop8:jecFactor0',
+                                                                    'Pruned8:Mass'  ,'Pruned8:Pt'  ,'Pruned8:Eta'  ,'Pruned8:Phi'  ,'Pruned8:jecFactor0',
+                                                                    'Trimmed8:Mass', 'Trimmed8:Pt', 'Trimmed8:Eta', 'Trimmed8:Phi', 'Trimmed8:jecFactor0']
 
 ##
 
@@ -606,7 +613,7 @@ addJetCollection(
 )
 
 ## Establish references between PATified fat jets and subjets using the BoostedJetMerger
-process.selectedPatJetsPrunedPFCHSPacked15 = cms.EDProducer("BoostedJetMerger",
+process.selectedPatJetsTrimmedPFCHSPacked15 = cms.EDProducer("BoostedJetMerger",
     jetSrc=cms.InputTag("selectedPatJetsTrimmedPFCHS15"),
     subjetSrc=cms.InputTag("selectedPatJetsTrimmedSubjetsPFCHS15")
 )
@@ -642,11 +649,11 @@ addJetCollection(
     genParticles = cms.InputTag(genParticles),
     explicitJTA = True,  # needed for subjet b tagging
     svClustering = True, # needed for subjet b tagging
-)
     fatJets = cms.InputTag('PFJetsCHS15'),              # needed for subjet flavor clustering
     groomedFatJets = cms.InputTag('PFJetsCHSPruned15'), # needed for subjet flavor clustering
     runIVF = False,
     # postfix = postfix
+)
 
 ## Establish references between PATified fat jets and subjets using the BoostedJetMerger
 process.selectedPatJetsPrunedPFCHSPacked15 = cms.EDProducer("BoostedJetMerger",
@@ -666,7 +673,7 @@ process.packedPatJetsPFCHS15.algoTags.append( cms.InputTag('selectedPatJetsSoftD
 process.packedPatJetsPFCHS15.algoLabels.append( 'SoftDrop' )
 process.packedPatJetsPFCHS15.algoTags.append( cms.InputTag('selectedPatJetsPrunedPFCHSPacked15') )
 process.packedPatJetsPFCHS15.algoLabels.append( 'Pruned' )
-process.packedPatJetsPFCHS15.algoTags.append( cms.InputTag('selectedPatJetsTrimedPFCHSPacked15') )
+process.packedPatJetsPFCHS15.algoTags.append( cms.InputTag('selectedPatJetsTrimmedPFCHSPacked15') )
 process.packedPatJetsPFCHS15.algoLabels.append( 'Trimmed' )
 
 process.SoftDrop15 = cms.EDProducer("RecoJetDeltaRValueMapProducer",
@@ -694,9 +701,9 @@ process.Pruned15 = cms.EDProducer("RecoJetDeltaRValueMapProducer",
     lazyParser = cms.bool(True)
 )
 
-getattr(process,'patJetsPFCHS15').userData.userFloats.src += ['SoftDrop:Mass','SoftDrop:Pt','SoftDrop:Eta','SoftDrop:Phi','SoftDrop:jecFactor0',
-                                                                    'Pruned:Mass'  ,'Pruned:Pt'  ,'Pruned:Eta'  ,'Pruned:Phi'  ,'Pruned:jecFactor0',
-                                                                    'Trimmed:Mass', 'Trimmed:Pt', 'Trimmed:Eta', 'Trimmed:Phi', 'Trimmed:jecFactor0']
+getattr(process,'patJetsPFCHS15').userData.userFloats.src += ['SoftDrop15:Mass','SoftDrop15:Pt','SoftDrop15:Eta','SoftDrop15:Phi','SoftDrop15:jecFactor0',
+                                                                    'Pruned15:Mass'  ,'Pruned15:Pt'  ,'Pruned15:Eta'  ,'Pruned15:Phi'  ,'Pruned15:jecFactor0',
+                                                                    'Trimmed15:Mass', 'Trimmed15:Pt', 'Trimmed15:Eta', 'Trimmed15:Phi', 'Trimmed15:jecFactor0']
 
 
 # ------------------------QG-----------------------------------------------
