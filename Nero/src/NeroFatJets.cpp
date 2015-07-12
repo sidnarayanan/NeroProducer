@@ -346,6 +346,16 @@ void NeroFatJets::doBTagging(const pat::Jet* jet) {
       break;
     }
   }
+  if (cont<2) {
+    zRatio->push_back(-1.);
+    svEnergyRatio1->push_back(-1);
+  }
+  if (cont<1) {
+    svMass0->push_back(-1);
+    svPt0->push_back(-1);
+    svEnergyRatio0->push_back(-1);
+    tauDot->push_back(-1);
+  }
 
 }
 

@@ -41,7 +41,7 @@ void BareFatJets::clear(){
 
 void BareFatJets::defineBranches(TTree *t, std::string prefix){
     //
-    BareP4::defineBranches(t, "prefix" );
+    BareP4::defineBranches(t, prefix );
     //
 
     rawPt = new vector<float>;
