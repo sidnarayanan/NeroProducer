@@ -172,20 +172,12 @@ int NeroFatJets::analyze(const edm::Event& iEvent){
 void NeroFatJets::doBTagging(const pat::Jet* jet) {
   const IPTagInfo * ipTagInfo = jet->tagInfoCandIP("pfImpactParameter");
   const SVTagInfo * svTagInfo = jet->tagInfoCandSecondaryVertex("pfInclusiveSecondaryVertexFinder");
-  // const std::vector<std::string>  tagInfoLabels = jet->tagInfoLabels();
-  // printf("==================================================\n");
-  // for (auto & label : tagInfoLabels) {
-  //   printf("label %s\n",label.c_str());
-  // }
-  // printf("svTagInfo = %p; ipTagInfo = %p\n",svTagInfo,ipTagInfo);
-  // printf("==================================================\n");
 
   std::vector<fastjet::PseudoJet> currentAxes;
   float tau1IVF_tmp = tau1->back();
   float tau2IVF_tmp = tau2->back();
   recalcNsubjettiness(*jet,*svTagInfo,tau1IVF_tmp,tau2IVF_tmp,currentAxes);
   tau1IVF->push_back(tau1IVF_tmp);
-  // printf("wolf fence\n"); exit(-1);
   tau2IVF->push_back(tau2IVF_tmp);
 
   const Tracks & selectedTracks( ipTagInfo->selectedTracks() );
@@ -202,24 +194,16 @@ void NeroFatJets::doBTagging(const pat::Jet* jet) {
   }
   math::XYZTLorentzVector allSum =  allKinematics.weightedVectorSum() ; //allKinematics.vectorSum()
 
-
-
   std::map<double, unsigned int> VTXmass;
   unsigned int nSV_tmp = svTagInfo->nVertices();
   nSV->push_back(nSV_tmp);
   unsigned int nMaxVertices = 128; // probably not more than this
-  // float svtxPt[nMaxVertices];
-  // float svtxEta[nMaxVertices];
-  // float svtxPhi[nMaxVertices];
   float svtxMass[nMaxVertices];
   float svtxEnergyRatio[nMaxVertices];
   float maxSVDeltaRToJet = R0-0.1+(R0-0.8)*0.1/0.7;
   for (unsigned int vtx = 0; vtx < nSV_tmp; ++vtx)  {
 
     const Vertex &vertex = svTagInfo->secondaryVertex(vtx);
-    // svtxPt[vtx]   = vertex.p4().pt();
-    // svtxEta[vtx]  = vertex.p4().eta();
-    // svtxPhi[vtx]  = vertex.p4().phi();
     svtxMass[vtx] = vertex.p4().mass();
 
     Int_t totcharge=0;

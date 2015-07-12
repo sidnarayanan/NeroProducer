@@ -474,6 +474,36 @@ process.packedPatJetsPFCHS8.algoLabels.append( 'Pruned' )
 process.packedPatJetsPFCHS8.algoTags.append( cms.InputTag('selectedPatJetsTrimmedPFCHSPacked8') )
 process.packedPatJetsPFCHS8.algoLabels.append( 'Trimmed' )
 
+
+process.SoftDrop8 = cms.EDProducer("RecoJetDeltaRValueMapProducer",
+    src = cms.InputTag("PFJetsCHS8"),
+    matched = cms.InputTag("selectedPatJetsSoftDropPFCHSPacked8"),
+    distMax = cms.double(.8),
+    values = cms.vstring('mass','pt','eta','phi','jecFactor(0)'),
+    valueLabels = cms.vstring('Mass','Pt','Eta','Phi','jecFactor0'),
+    lazyParser = cms.bool(True)
+)
+process.Trimmed8 = cms.EDProducer("RecoJetDeltaRValueMapProducer",
+    src = cms.InputTag("PFJetsCHS8"),
+    matched = cms.InputTag("selectedPatJetsTrimmedPFCHSPacked8"),
+    distMax = cms.double(.8),
+    values = cms.vstring('mass','pt','eta','phi','jecFactor(0)'),
+    valueLabels = cms.vstring('Mass','Pt','Eta','Phi','jecFactor0'),
+    lazyParser = cms.bool(True)
+)
+process.Pruned8 = cms.EDProducer("RecoJetDeltaRValueMapProducer",
+    src = cms.InputTag("PFJetsCHS8"),
+    matched = cms.InputTag("selectedPatJetsPrunedPFCHSPacked8"),
+    distMax = cms.double(.8),
+    values = cms.vstring('mass','pt','eta','phi','jecFactor(0)'),
+    valueLabels = cms.vstring('Mass','Pt','Eta','Phi','jecFactor0'),
+    lazyParser = cms.bool(True)
+)
+
+getattr(process,'patJetsPFCHS8').userData.userFloats.src += ['SoftDrop:Mass','SoftDrop:Pt','SoftDrop:Eta','SoftDrop:Phi','SoftDrop:jecFactor0',
+                                                                    'Pruned:Mass'  ,'Pruned:Pt'  ,'Pruned:Eta'  ,'Pruned:Phi'  ,'Pruned:jecFactor0',
+                                                                    'Trimmed:Mass', 'Trimmed:Pt', 'Trimmed:Eta', 'Trimmed:Phi', 'Trimmed:jecFactor0']
+
 ##
 
 addJetCollection(
@@ -612,11 +642,11 @@ addJetCollection(
     genParticles = cms.InputTag(genParticles),
     explicitJTA = True,  # needed for subjet b tagging
     svClustering = True, # needed for subjet b tagging
+)
     fatJets = cms.InputTag('PFJetsCHS15'),              # needed for subjet flavor clustering
     groomedFatJets = cms.InputTag('PFJetsCHSPruned15'), # needed for subjet flavor clustering
     runIVF = False,
     # postfix = postfix
-)
 
 ## Establish references between PATified fat jets and subjets using the BoostedJetMerger
 process.selectedPatJetsPrunedPFCHSPacked15 = cms.EDProducer("BoostedJetMerger",
@@ -638,6 +668,35 @@ process.packedPatJetsPFCHS15.algoTags.append( cms.InputTag('selectedPatJetsPrune
 process.packedPatJetsPFCHS15.algoLabels.append( 'Pruned' )
 process.packedPatJetsPFCHS15.algoTags.append( cms.InputTag('selectedPatJetsTrimedPFCHSPacked15') )
 process.packedPatJetsPFCHS15.algoLabels.append( 'Trimmed' )
+
+process.SoftDrop15 = cms.EDProducer("RecoJetDeltaRValueMapProducer",
+    src = cms.InputTag("PFJetsCHS15"),
+    matched = cms.InputTag("selectedPatJetsSoftDropPFCHSPacked15"),
+    distMax = cms.double(1.5),
+    values = cms.vstring('mass','pt','eta','phi','jecFactor(0)'),
+    valueLabels = cms.vstring('Mass','Pt','Eta','Phi','jecFactor0'),
+    lazyParser = cms.bool(True)
+)
+process.Trimmed15 = cms.EDProducer("RecoJetDeltaRValueMapProducer",
+    src = cms.InputTag("PFJetsCHS15"),
+    matched = cms.InputTag("selectedPatJetsTrimmedPFCHSPacked15"),
+    distMax = cms.double(1.5),
+    values = cms.vstring('mass','pt','eta','phi','jecFactor(0)'),
+    valueLabels = cms.vstring('Mass','Pt','Eta','Phi','jecFactor0'),
+    lazyParser = cms.bool(True)
+)
+process.Pruned15 = cms.EDProducer("RecoJetDeltaRValueMapProducer",
+    src = cms.InputTag("PFJetsCHS15"),
+    matched = cms.InputTag("selectedPatJetsPrunedPFCHSPacked15"),
+    distMax = cms.double(1.5),
+    values = cms.vstring('mass','pt','eta','phi','jecFactor(0)'),
+    valueLabels = cms.vstring('Mass','Pt','Eta','Phi','jecFactor0'),
+    lazyParser = cms.bool(True)
+)
+
+getattr(process,'patJetsPFCHS15').userData.userFloats.src += ['SoftDrop:Mass','SoftDrop:Pt','SoftDrop:Eta','SoftDrop:Phi','SoftDrop:jecFactor0',
+                                                                    'Pruned:Mass'  ,'Pruned:Pt'  ,'Pruned:Eta'  ,'Pruned:Phi'  ,'Pruned:jecFactor0',
+                                                                    'Trimmed:Mass', 'Trimmed:Pt', 'Trimmed:Eta', 'Trimmed:Phi', 'Trimmed:jecFactor0']
 
 
 # ------------------------QG-----------------------------------------------

@@ -6,10 +6,7 @@ nero.triggerNames = cms.vstring(['HLT_PFMET170_NoiseCleaned'
 
 nero.fatjetsCA8 = cms.InputTag('packedPatJetsPFCHS8')
 nero.fatjetsCA15 = cms.InputTag('packedPatJetsPFCHS15')
-nero.groomedFatjetsCA8 = cms.InputTag('selectedPatJetsPrunedPFCHSPacked8')
-nero.groomedFatjetsCA15 = cms.InputTag('selectedPatJetsPrunedPFCHSPacked15')
 nero.subjets = cms.string('SoftDrop')
-nero.groomedSubjets = cms.string('Pruned')
 
 nero.minJetPt  = cms.double (30.)
 nero.minJetEta = cms.double (2.5)

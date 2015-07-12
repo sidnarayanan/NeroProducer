@@ -136,26 +136,6 @@ Nero::Nero(const edm::ParameterSet& iConfig)
     obj.push_back(fatjetsCA8);
 
     //--
-    NeroFatJets *groomedFatjetsCA15 = new NeroFatJets(1.5);
-    fatjetsCA15 -> mOnlyMc = onlyMc;
-    fatjetsCA15 -> token = consumes<pat::JetCollection>(iConfig.getParameter<edm::InputTag>("groomedFatjetsCA15"));
-    fatjetsCA15 -> SetPrefix("groomedFatjetsCA15");
-    fatjetsCA15->SetSubjetsName(iConfig.getParameter<std::string>("groomedSubjets"));
-    fatjetsCA15->primaryVertices = vtx->handle;
-    obj.push_back(groomedFatjetsCA15);
-
-    //--
-    NeroFatJets *groomedFatjetsCA8 = new NeroFatJets(.8);
-    fatjetsCA8 -> mOnlyMc = onlyMc;
-    fatjetsCA8 -> token = consumes<pat::JetCollection>(iConfig.getParameter<edm::InputTag>("groomedFatjetsCA8"));
-    fatjetsCA8 -> SetPrefix("groomedFatjetsCA8");
-    fatjetsCA8->SetSubjetsName(iConfig.getParameter<std::string>("groomedSubjets"));
-    fatjetsCA8->primaryVertices = vtx->handle;
-    obj.push_back(groomedFatjetsCA8);
-
-
-
-    //--
     NeroMet *met = new NeroMet();
     met -> mOnlyMc = onlyMc;
     met -> token = consumes<pat::METCollection>(iConfig.getParameter<edm::InputTag>("mets"));
