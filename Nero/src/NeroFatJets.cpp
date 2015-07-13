@@ -191,6 +191,8 @@ int NeroFatJets::analyze(const edm::Event& iEvent){
 
     int ijetRef = -1;
     int nsubjet = 0;
+
+
     for (const pat::Jet& j : *handle)
     {
         ijetRef++;
@@ -211,34 +213,38 @@ int NeroFatJets::analyze(const edm::Event& iEvent){
         tau2 -> push_back(j.userFloat("Njettiness:tau2"));
         tau3 -> push_back(j.userFloat("Njettiness:tau3"));
 
-        // B Tagging
-        if (doSubstructure)
-          doBTagging(&j);
-
+        
         trimmedMass ->push_back(j.userFloat("PFJetsCHSTrimmedMass"));
         prunedMass  ->push_back(j.userFloat("PFJetsCHSPrunedMass"));
         filteredMass->push_back(j.userFloat("PFJetsCHSFilteredMass"));
         softdropMass->push_back(j.userFloat("PFJetsCHSSoftDropMass"));
         hasSubjet->push_back(j.hasSubjets(SubjetsName));
 
-        // get groomed jet infos
-        TString sR0 = TString::Format("%i",int(R0*10));
-        TString sPt(":Pt");  TString sEta(":Eta");  TString sPhi(":Phi"); TString sJEC0(":jecFactor0");
-        TString sPruned = TString("Pruned") + sR0;
-        TString sTrimmed = TString("Trimmed") + sR0;
-        TString sSD = TString("SoftDrop") + sR0;
-        prunedPt->push_back(j.userFloat( (sPruned+sPt).Data() ));
-        prunedEta->push_back(j.userFloat( (sPruned+sEta).Data() ));
-        prunedPhi->push_back(j.userFloat( (sPruned+sPhi).Data() ));
-        prunedJEC0->push_back(j.userFloat( (sPruned+sJEC0).Data() ));
-        trimmedPt->push_back(j.userFloat( (sTrimmed+sPt).Data() ));
-        trimmedEta->push_back(j.userFloat( (sTrimmed+sEta).Data() ));
-        trimmedPhi->push_back(j.userFloat( (sTrimmed+sPhi).Data() ));
-        trimmedJEC0->push_back(j.userFloat( (sTrimmed+sJEC0).Data() ));
-        sdPt->push_back(j.userFloat( (sSD+sPt).Data() ));
-        sdEta->push_back(j.userFloat( (sSD+sEta).Data() ));
-        sdPhi->push_back(j.userFloat( (sSD+sPhi).Data() ));
-        sdJEC0->push_back(j.userFloat( (sSD+sJEC0).Data() ));
+
+        // B Tagging
+        if (doSubstructure) {
+          doBTagging(&j);
+
+          // get groomed jet infos
+          TString sR0 = TString::Format("%i",int(R0*10));
+          TString sPt(":Pt");  TString sEta(":Eta");  TString sPhi(":Phi"); TString sJEC0(":jecFactor0");
+          TString sPruned = TString("Pruned") + sR0;
+          TString sTrimmed = TString("Trimmed") + sR0;
+          TString sSD = TString("SoftDrop") + sR0;
+
+          prunedPt->push_back(j.userFloat( (sPruned+sPt).Data() ));
+          prunedEta->push_back(j.userFloat( (sPruned+sEta).Data() ));
+          prunedPhi->push_back(j.userFloat( (sPruned+sPhi).Data() ));
+          prunedJEC0->push_back(j.userFloat( (sPruned+sJEC0).Data() ));
+          trimmedPt->push_back(j.userFloat( (sTrimmed+sPt).Data() ));
+          trimmedEta->push_back(j.userFloat( (sTrimmed+sEta).Data() ));
+          trimmedPhi->push_back(j.userFloat( (sTrimmed+sPhi).Data() ));
+          trimmedJEC0->push_back(j.userFloat( (sTrimmed+sJEC0).Data() ));
+          sdPt->push_back(j.userFloat( (sSD+sPt).Data() ));
+          sdEta->push_back(j.userFloat( (sSD+sEta).Data() ));
+          sdPhi->push_back(j.userFloat( (sSD+sPhi).Data() ));
+          sdJEC0->push_back(j.userFloat( (sSD+sJEC0).Data() ));
+        }
 
         auto Subjets = j.subjets(SubjetsName);
         for ( auto const & i : Subjets ) {

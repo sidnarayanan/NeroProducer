@@ -111,13 +111,12 @@ Nero::Nero(const edm::ParameterSet& iConfig)
 
 
     bool doSubstructure = iConfig.getParameter<bool>("doSubstructure");
-    --
+    // --
     NeroFatJets *fatjets = new NeroFatJets(.8);
     fatjets -> mOnlyMc = onlyMc;
     fatjets -> token = consumes<pat::JetCollection>(iConfig.getParameter<edm::InputTag>("fatjets"));
-    fatjets->SetSubjetsName("SubJets");
-    if (doSubstructure)
-      fatjets->doSubstructure = 1;
+    fatjets->SetSubjetsName("SoftDrop");
+    fatjets->doSubstructure = 0; // make extra sure we never do btagging on this collection
     obj.push_back(fatjets);
 
     if (doSubstructure) {
