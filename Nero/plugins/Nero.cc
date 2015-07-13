@@ -48,7 +48,6 @@ Nero::Nero(const edm::ParameterSet& iConfig)
 
 {
     bool onlyMc = iConfig.getParameter<bool>("onlyMc");
-
     // not push_back inline because he needs to know the class type for init
     NeroEvent *evt = new NeroEvent();
     evt -> mOnlyMc = onlyMc;
@@ -110,30 +109,38 @@ Nero::Nero(const edm::ParameterSet& iConfig)
 
     obj. push_back(leps);
 
-    //--
-    // NeroFatJets *fatjets = new NeroFatJets(.8);
-    // fatjets -> mOnlyMc = onlyMc;
-    // fatjets -> token = consumes<pat::JetCollection>(iConfig.getParameter<edm::InputTag>("fatjets"));
-    // fatjets->SetSubjetsName(iConfig.getParameter<std::string>("subjets"));
-    // obj.push_back(fatjets);
 
-    //--
-    NeroFatJets *fatjetsCA15 = new NeroFatJets(1.5);
-    fatjetsCA15 -> mOnlyMc = onlyMc;
-    fatjetsCA15 -> token = consumes<pat::JetCollection>(iConfig.getParameter<edm::InputTag>("fatjetsCA15"));
-    fatjetsCA15 -> SetPrefix("fatjetsCA15");
-    fatjetsCA15->SetSubjetsName(iConfig.getParameter<std::string>("subjets"));
-    fatjetsCA15->primaryVertices = vtx->handle;
-    obj.push_back(fatjetsCA15);
+    bool doSubstructure = iConfig.getParameter<bool>("doSubstructure");
+    --
+    NeroFatJets *fatjets = new NeroFatJets(.8);
+    fatjets -> mOnlyMc = onlyMc;
+    fatjets -> token = consumes<pat::JetCollection>(iConfig.getParameter<edm::InputTag>("fatjets"));
+    fatjets->SetSubjetsName("SubJets");
+    if (doSubstructure)
+      fatjets->doSubstructure = 1;
+    obj.push_back(fatjets);
 
-    //--
-    NeroFatJets *fatjetsCA8 = new NeroFatJets(.8);
-    fatjetsCA8 -> mOnlyMc = onlyMc;
-    fatjetsCA8 -> token = consumes<pat::JetCollection>(iConfig.getParameter<edm::InputTag>("fatjetsCA8"));
-    fatjetsCA8 -> SetPrefix("fatjetsCA8");
-    fatjetsCA8->SetSubjetsName(iConfig.getParameter<std::string>("subjets"));
-    fatjetsCA8->primaryVertices = vtx->handle;
-    obj.push_back(fatjetsCA8);
+    if (doSubstructure) {
+        //--
+        NeroFatJets *fatjetsCA15 = new NeroFatJets(1.5);
+        fatjetsCA15 -> mOnlyMc = onlyMc;
+        fatjetsCA15 -> token = consumes<pat::JetCollection>(iConfig.getParameter<edm::InputTag>("fatjetsCA15"));
+        fatjetsCA15 -> SetPrefix("fatjetsCA15");
+        fatjetsCA15->SetSubjetsName(iConfig.getParameter<std::string>("subjets"));
+        fatjetsCA15->primaryVertices = vtx->handle;
+        fatjetsCA15->doSubstructure = 1;
+        obj.push_back(fatjetsCA15);
+
+        //--
+        NeroFatJets *fatjetsCA8 = new NeroFatJets(.8);
+        fatjetsCA8 -> mOnlyMc = onlyMc;
+        fatjetsCA8 -> token = consumes<pat::JetCollection>(iConfig.getParameter<edm::InputTag>("fatjetsCA8"));
+        fatjetsCA8 -> SetPrefix("fatjetsCA8");
+        fatjetsCA8->SetSubjetsName(iConfig.getParameter<std::string>("subjets"));
+        fatjetsCA8->primaryVertices = vtx->handle;
+        fatjetsCA8->doSubstructure = 1;
+        obj.push_back(fatjetsCA8);
+    }
 
     //--
     NeroMet *met = new NeroMet();

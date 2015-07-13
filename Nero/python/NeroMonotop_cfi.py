@@ -4,6 +4,7 @@ from NeroProducer.Nero.Nero_cfi import nero
 nero.triggerNames = cms.vstring(['HLT_PFMET170_NoiseCleaned'
                                 'HLT_PFMETNoMu120_NoiseCleaned_PFMHTNoMu120_IDTight'])
 
+nero.doSubstructure = cms.bool(True)
 nero.fatjetsCA8 = cms.InputTag('packedPatJetsPFCHS8')
 nero.fatjetsCA15 = cms.InputTag('packedPatJetsPFCHS15')
 nero.subjets = cms.string('SoftDrop')

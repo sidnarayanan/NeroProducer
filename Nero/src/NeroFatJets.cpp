@@ -212,7 +212,8 @@ int NeroFatJets::analyze(const edm::Event& iEvent){
         tau3 -> push_back(j.userFloat("Njettiness:tau3"));
 
         // B Tagging
-        doBTagging(&j);
+        if (doSubstructure)
+          doBTagging(&j);
 
         trimmedMass ->push_back(j.userFloat("PFJetsCHSTrimmedMass"));
         prunedMass  ->push_back(j.userFloat("PFJetsCHSPrunedMass"));

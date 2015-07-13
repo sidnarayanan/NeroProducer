@@ -28,6 +28,7 @@ class NeroFatJets : virtual public NeroCollection,
       void defineBranches(TTree *);
       void clear();
 
+      bool doSubstructure = 0;
 
       // --- specific fuctions
       // --- Handle
