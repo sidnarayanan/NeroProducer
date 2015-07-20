@@ -511,6 +511,22 @@ getattr(process,'patJetsPFCHS8').userData.userFloats.src += ['SoftDrop8:Mass','S
                                                                     'Pruned8:Mass'  ,'Pruned8:Pt'  ,'Pruned8:Eta'  ,'Pruned8:Phi'  ,'Pruned8:jecFactor0',
                                                                     'Trimmed8:Mass', 'Trimmed8:Pt', 'Trimmed8:Eta', 'Trimmed8:Phi', 'Trimmed8:jecFactor0']
 
+process.Njettiness8 = Njettiness.clone(
+        src = cms.InputTag("PFJetsCHS8"),
+        R0  = cms.double(.8)
+    )
+getattr(process,'patJetsPFCHS8').userData.userFloats.src += ['Njettiness8:tau1','Njettiness8:tau2','Njettiness8:tau3','Njettiness8:tau4']
+process.RandomNumberGeneratorService = cms.Service("RandomNumberGeneratorService")
+process.Qjets8 = QJetsAdder.clone(
+    src = cms.InputTag("PFJetsCHS8"),
+    jetRad = cms.double(.8),
+    jetAlgo = cms.string(algoLabel),
+)
+getattr(process,'patJetsPFCHS8').userData.userFloats.src += ['Qjets8:QjetsVolatility']
+setattr(process.RandomNumberGeneratorService, "Qjets", cms.PSet(initialSeed = cms.untracked.uint32(42),
+                                                                engineName = cms.untracked.string('TRandom3')))
+
+
 ##
 
 addJetCollection(
@@ -704,6 +720,20 @@ process.Pruned15 = cms.EDProducer("RecoJetDeltaRValueMapProducer",
 getattr(process,'patJetsPFCHS15').userData.userFloats.src += ['SoftDrop15:Mass','SoftDrop15:Pt','SoftDrop15:Eta','SoftDrop15:Phi','SoftDrop15:jecFactor0',
                                                                     'Pruned15:Mass'  ,'Pruned15:Pt'  ,'Pruned15:Eta'  ,'Pruned15:Phi'  ,'Pruned15:jecFactor0',
                                                                     'Trimmed15:Mass', 'Trimmed15:Pt', 'Trimmed15:Eta', 'Trimmed15:Phi', 'Trimmed15:jecFactor0']
+
+process.Njettiness15 = Njettiness.clone(
+        src = cms.InputTag("PFJetsCHS15"),
+        R0  = cms.double(1.5)
+    )
+getattr(process,'patJetsPFCHS15').userData.userFloats.src += ['Njettiness15:tau1','Njettiness15:tau2','Njettiness15:tau3','Njettiness15:tau4']
+process.Qjets15 = QJetsAdder.clone(
+    src = cms.InputTag("PFJetsCHS15"),
+    jetRad = cms.double(1.5),
+    jetAlgo = cms.string(algoLabel),
+)
+getattr(process,'patJetsPFCHS15').userData.userFloats.src += ['Qjets15:QjetsVolatility']
+setattr(process.RandomNumberGeneratorService, "Qjets", cms.PSet(initialSeed = cms.untracked.uint32(42),
+                                                                engineName = cms.untracked.string('TRandom3')))
 
 
 # ------------------------QG-----------------------------------------------

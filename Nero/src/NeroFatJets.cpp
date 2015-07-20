@@ -59,229 +59,6 @@ NeroFatJets::NeroFatJets(double r0) : BareFatJets(),
 NeroFatJets::~NeroFatJets(){
 }
 
-void NeroFatJets::clear() {
-  BareFatJets::clear();
-  tau1IVF->clear();
-  tau2IVF->clear();
-  nSV->clear();
-  zRatio->clear();
-  tauDot->clear();
-  svMass->clear();
-  svEnergyRatio->clear();
-  svPt->clear();
-  prunedPt->clear();
-  prunedEta->clear();
-  prunedPhi->clear();
-  prunedJEC0->clear();
-  trimmedPt->clear();
-  trimmedEta->clear();
-  trimmedPhi->clear();
-  trimmedJEC0->clear();
-  sdPt->clear();
-  sdEta->clear();
-  sdPhi->clear();
-  sdJEC0->clear();
-  nTracks->clear();
-  trackMomentum->clear();
-  trackEta->clear();
-  trackPhi->clear();
-  trackPtRel->clear();
-  trackPPar->clear();
-  trackEtaRel->clear();
-  trackDeltaR->clear();
-  trackPtRatio->clear();
-  trackPParRatio->clear();
-  trackSip2dVal->clear();
-  trackSip2dSig->clear();
-  trackSip3dVal->clear();
-  trackSip3dSig->clear();
-  trackDecayLenVal->clear();
-  trackDecayLenSig->clear();
-  trackJetDistVal->clear();
-  trackJetDistSig->clear();
-  trackChi2->clear();
-  trackNTotalHits->clear();
-  trackNPixelHits->clear();
-
-}
-
-void NeroFatJets::defineBranches(TTree * t){
-  BareFatJets::defineBranches(t,prefix);
-  tau1IVF = new vector<float>;
-  tau2IVF = new vector<float>;
-  nSV = new vector<unsigned int>;
-  zRatio = new vector<float>;
-  tauDot = new vector<float>;
-  svMass = new vector<vector<float>*>;
-  svEnergyRatio = new vector<vector<float>*>;
-  svPt = new vector<vector<float>*>;
-  prunedPt = new vector<float>;
-  prunedEta = new vector<float>;
-  prunedPhi = new vector<float>;
-  prunedJEC0 = new vector<float>;
-  trimmedPt = new vector<float>;
-  trimmedEta = new vector<float>;
-  trimmedPhi = new vector<float>;
-  trimmedJEC0 = new vector<float>;
-  sdPt = new vector<float>;
-  sdEta = new vector<float>;
-  sdPhi = new vector<float>;
-  sdJEC0 = new vector<float>;
-  nTracks = new vector<int>;
-  trackMomentum = new vector<vector<float>*>;
-  trackEta = new vector<vector<float>*>;
-  trackPhi = new vector<vector<float>*>;
-  trackPtRel = new vector<vector<float>*>;
-  trackPPar = new vector<vector<float>*>;
-  trackEtaRel = new vector<vector<float>*>;
-  trackDeltaR = new vector<vector<float>*>;
-  trackPtRatio = new vector<vector<float>*>;
-  trackPParRatio = new vector<vector<float>*>;
-  trackSip2dVal = new vector<vector<float>*>;
-  trackSip2dSig = new vector<vector<float>*>;
-  trackSip3dVal = new vector<vector<float>*>;
-  trackSip3dSig = new vector<vector<float>*>;
-  trackDecayLenVal = new vector<vector<float>*>;
-  trackDecayLenSig = new vector<vector<float>*>;
-  trackJetDistVal = new vector<vector<float>*>;
-  trackJetDistSig = new vector<vector<float>*>;
-  trackChi2 = new vector<vector<float>*>;
-  trackNTotalHits = new vector<vector<int>*>;
-  trackNPixelHits = new vector<vector<int>*>;
-
-  t->Branch((prefix+string("_tau1IVF")).c_str(),"vector<float>",&tau1IVF);
-  t->Branch((prefix+string("_tau2IVF")).c_str(),"vector<float>",&tau2IVF);
-  t->Branch((prefix+string("_nSV")).c_str(),"vector<unsigned int>",&nSV);
-  t->Branch((prefix+string("_zRatio")).c_str(),"vector<float>",&zRatio);
-  t->Branch((prefix+string("_tauDot")).c_str(),"vector<float>",&tauDot);
-  t->Branch((prefix+string("_svMass")).c_str(),"vector<vector<float>*>",&svMass);
-  t->Branch((prefix+string("_svEnergyRatio")).c_str(),"vector<vector<float>*>",&svEnergyRatio);
-  t->Branch((prefix+string("_svPt")).c_str(),"vector<vector<float>*>",&svPt);
-  t->Branch((prefix+string("_prunedPt")).c_str(),"vector<float>",&prunedPt);
-  t->Branch((prefix+string("_prunedEta")).c_str(),"vector<float>",&prunedEta);
-  t->Branch((prefix+string("_prunedPhi")).c_str(),"vector<float>",&prunedPhi);
-  t->Branch((prefix+string("_prunedJEC0")).c_str(),"vector<float>",&prunedJEC0);
-  t->Branch((prefix+string("_trimmedPt")).c_str(),"vector<float>",&trimmedPt);
-  t->Branch((prefix+string("_trimmedEta")).c_str(),"vector<float>",&trimmedEta);
-  t->Branch((prefix+string("_trimmedPhi")).c_str(),"vector<float>",&trimmedPhi);
-  t->Branch((prefix+string("_trimmedJEC0")).c_str(),"vector<float>",&trimmedJEC0);
-  t->Branch((prefix+string("_sdPt")).c_str(),"vector<float>",&sdPt);
-  t->Branch((prefix+string("_sdEta")).c_str(),"vector<float>",&sdEta);
-  t->Branch((prefix+string("_sdPhi")).c_str(),"vector<float>",&sdPhi);
-  t->Branch((prefix+string("_sdJEC0")).c_str(),"vector<float>",&sdJEC0);
-  t->Branch((prefix+string("_nTracks")).c_str(),"vector<int>",&nTracks);
-  t->Branch((prefix+string("_trackMomentum")).c_str(),"vector<vector<float>*>",&trackMomentum);
-  t->Branch((prefix+string("_trackEta")).c_str(),"vector<vector<float>*>",&trackEta);
-  t->Branch((prefix+string("_trackPhi")).c_str(),"vector<vector<float>*>",&trackPhi);
-  t->Branch((prefix+string("_trackPtRel")).c_str(),"vector<vector<float>*>",&trackPtRel);
-  t->Branch((prefix+string("_trackPPar")).c_str(),"vector<vector<float>*>",&trackPPar);
-  t->Branch((prefix+string("_trackEtaRel")).c_str(),"vector<vector<float>*>",&trackEtaRel);
-  t->Branch((prefix+string("_trackDeltaR")).c_str(),"vector<vector<float>*>",&trackDeltaR);
-  t->Branch((prefix+string("_trackPtRatio")).c_str(),"vector<vector<float>*>",&trackPtRatio);
-  t->Branch((prefix+string("_trackPParRatio")).c_str(),"vector<vector<float>*>",&trackPParRatio);
-  t->Branch((prefix+string("_trackSip2dVal")).c_str(),"vector<vector<float>*>",&trackSip2dVal);
-  t->Branch((prefix+string("_trackSip2dSig")).c_str(),"vector<vector<float>*>",&trackSip2dSig);
-  t->Branch((prefix+string("_trackSip3dVal")).c_str(),"vector<vector<float>*>",&trackSip3dVal);
-  t->Branch((prefix+string("_trackSip3dSig")).c_str(),"vector<vector<float>*>",&trackSip3dSig);
-  t->Branch((prefix+string("_trackDecayLenVal")).c_str(),"vector<vector<float>*>",&trackDecayLenVal);
-  t->Branch((prefix+string("_trackDecayLenSig")).c_str(),"vector<vector<float>*>",&trackDecayLenSig);
-  t->Branch((prefix+string("_trackJetDistVal")).c_str(),"vector<vector<float>*>",&trackJetDistVal);
-  t->Branch((prefix+string("_trackJetDistSig")).c_str(),"vector<vector<float>*>",&trackJetDistSig);
-  t->Branch((prefix+string("_trackChi2")).c_str(),"vector<vector<float>*>",&trackChi2);
-  t->Branch((prefix+string("_trackNTotalHits")).c_str(),"vector<vector<int>*>",&trackNTotalHits);
-  t->Branch((prefix+string("_trackNPixelHits")).c_str(),"vector<vector<int>*>",&trackNPixelHits);
-
-}
-
-void NeroFatJets::setBranchAddresses(TTree *t){
-  //
-  BareFatJets::setBranchAddresses(t,prefix);
-  tau1IVF = new vector<float>;
-  tau2IVF = new vector<float>;
-  nSV = new vector<unsigned int>;
-  zRatio = new vector<float>;
-  tauDot = new vector<float>;
-  svMass = new vector<vector<float>*>;
-  svEnergyRatio = new vector<vector<float>*>;
-  svPt = new vector<vector<float>*>;
-  prunedPt = new vector<float>;
-  prunedEta = new vector<float>;
-  prunedPhi = new vector<float>;
-  prunedJEC0 = new vector<float>;
-  trimmedPt = new vector<float>;
-  trimmedEta = new vector<float>;
-  trimmedPhi = new vector<float>;
-  trimmedJEC0 = new vector<float>;
-  sdPt = new vector<float>;
-  sdEta = new vector<float>;
-  sdPhi = new vector<float>;
-  sdJEC0 = new vector<float>;
-  nTracks = new vector<int>;
-  trackMomentum = new vector<vector<float>*>;
-  trackEta = new vector<vector<float>*>;
-  trackPhi = new vector<vector<float>*>;
-  trackPtRel = new vector<vector<float>*>;
-  trackPPar = new vector<vector<float>*>;
-  trackEtaRel = new vector<vector<float>*>;
-  trackDeltaR = new vector<vector<float>*>;
-  trackPtRatio = new vector<vector<float>*>;
-  trackPParRatio = new vector<vector<float>*>;
-  trackSip2dVal = new vector<vector<float>*>;
-  trackSip2dSig = new vector<vector<float>*>;
-  trackSip3dVal = new vector<vector<float>*>;
-  trackSip3dSig = new vector<vector<float>*>;
-  trackDecayLenVal = new vector<vector<float>*>;
-  trackDecayLenSig = new vector<vector<float>*>;
-  trackJetDistVal = new vector<vector<float>*>;
-  trackJetDistSig = new vector<vector<float>*>;
-  trackChi2 = new vector<vector<float>*>;
-  trackNTotalHits = new vector<vector<int>*>;
-  trackNPixelHits = new vector<vector<int>*>;
-
-  t->SetBranchAddress((prefix+string("_tau1IVF")).c_str(),&tau1IVF);
-  t->SetBranchAddress((prefix+string("_tau2IVF")).c_str(),&tau2IVF);
-  t->SetBranchAddress((prefix+string("_nSV")).c_str(),&nSV);
-  t->SetBranchAddress((prefix+string("_zRatio")).c_str(),&zRatio);
-  t->SetBranchAddress((prefix+string("_tauDot")).c_str(),&tauDot);
-  t->SetBranchAddress((prefix+string("_svMass")).c_str(),&svMass);
-  t->SetBranchAddress((prefix+string("_svEnergyRatio")).c_str(),&svEnergyRatio);
-  t->SetBranchAddress((prefix+string("_svPt")).c_str(),&svPt);
-  t->SetBranchAddress((prefix+string("_prunedPt")).c_str(),&prunedPt);
-  t->SetBranchAddress((prefix+string("_prunedEta")).c_str(),&prunedEta);
-  t->SetBranchAddress((prefix+string("_prunedPhi")).c_str(),&prunedPhi);
-  t->SetBranchAddress((prefix+string("_prunedJEC0")).c_str(),&prunedJEC0);
-  t->SetBranchAddress((prefix+string("_trimmedPt")).c_str(),&trimmedPt);
-  t->SetBranchAddress((prefix+string("_trimmedEta")).c_str(),&trimmedEta);
-  t->SetBranchAddress((prefix+string("_trimmedPhi")).c_str(),&trimmedPhi);
-  t->SetBranchAddress((prefix+string("_trimmedJEC0")).c_str(),&trimmedJEC0);
-  t->SetBranchAddress((prefix+string("_sdPt")).c_str(),&sdPt);
-  t->SetBranchAddress((prefix+string("_sdEta")).c_str(),&sdEta);
-  t->SetBranchAddress((prefix+string("_sdPhi")).c_str(),&sdPhi);
-  t->SetBranchAddress((prefix+string("_sdJEC0")).c_str(),&sdJEC0);
-  t->SetBranchAddress((prefix+string("_nTracks")).c_str(),&nTracks);
-  t->SetBranchAddress((prefix+string("_trackMomentum")).c_str(),&trackMomentum);
-  t->SetBranchAddress((prefix+string("_trackEta")).c_str(),&trackEta);
-  t->SetBranchAddress((prefix+string("_trackPhi")).c_str(),&trackPhi);
-  t->SetBranchAddress((prefix+string("_trackPtRel")).c_str(),&trackPtRel);
-  t->SetBranchAddress((prefix+string("_trackPPar")).c_str(),&trackPPar);
-  t->SetBranchAddress((prefix+string("_trackEtaRel")).c_str(),&trackEtaRel);
-  t->SetBranchAddress((prefix+string("_trackDeltaR")).c_str(),&trackDeltaR);
-  t->SetBranchAddress((prefix+string("_trackPtRatio")).c_str(),&trackPtRatio);
-  t->SetBranchAddress((prefix+string("_trackPParRatio")).c_str(),&trackPParRatio);
-  t->SetBranchAddress((prefix+string("_trackSip2dVal")).c_str(),&trackSip2dVal);
-  t->SetBranchAddress((prefix+string("_trackSip2dSig")).c_str(),&trackSip2dSig);
-  t->SetBranchAddress((prefix+string("_trackSip3dVal")).c_str(),&trackSip3dVal);
-  t->SetBranchAddress((prefix+string("_trackSip3dSig")).c_str(),&trackSip3dSig);
-  t->SetBranchAddress((prefix+string("_trackDecayLenVal")).c_str(),&trackDecayLenVal);
-  t->SetBranchAddress((prefix+string("_trackDecayLenSig")).c_str(),&trackDecayLenSig);
-  t->SetBranchAddress((prefix+string("_trackJetDistVal")).c_str(),&trackJetDistVal);
-  t->SetBranchAddress((prefix+string("_trackJetDistSig")).c_str(),&trackJetDistSig);
-  t->SetBranchAddress((prefix+string("_trackChi2")).c_str(),&trackChi2);
-  t->SetBranchAddress((prefix+string("_trackNTotalHits")).c_str(),&trackNTotalHits);
-  t->SetBranchAddress((prefix+string("_trackNPixelHits")).c_str(),&trackNPixelHits);
-
-}
-
 
 int NeroFatJets::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup){
 
@@ -310,10 +87,6 @@ int NeroFatJets::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
 
         rawPt -> push_back (j.pt()*j.jecFactor("Uncorrected"));
         flavour -> push_back( j.partonFlavour() );
-        tau1 -> push_back(j.userFloat("Njettiness:tau1"));
-        tau2 -> push_back(j.userFloat("Njettiness:tau2"));
-        tau3 -> push_back(j.userFloat("Njettiness:tau3"));
-
 
         trimmedMass ->push_back(j.userFloat("PFJetsCHSTrimmedMass"));
         prunedMass  ->push_back(j.userFloat("PFJetsCHSPrunedMass"));
@@ -321,30 +94,44 @@ int NeroFatJets::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
         softdropMass->push_back(j.userFloat("PFJetsCHSSoftDropMass"));
         hasSubjet->push_back(j.hasSubjets(SubjetsName));
 
-
-        // B Tagging
         if (doSubstructure) {
+          // B Tagging
           runBTagging(&j);
 
           // get groomed jet infos
           TString sR0 = TString::Format("%i",int(R0*10));
-          TString sPt(":Pt");  TString sEta(":Eta");  TString sPhi(":Phi"); TString sJEC0(":jecFactor0");
+          TString sPt(":Pt");  TString sEta(":Eta");  TString sPhi(":Phi"); TString sJEC0(":jecFactor0"); TString sMass(":Mass");
           TString sPruned = TString("Pruned") + sR0;
           TString sTrimmed = TString("Trimmed") + sR0;
           TString sSD = TString("SoftDrop") + sR0;
-
-          prunedPt->push_back(j.userFloat( (sPruned+sPt).Data() ));
-          prunedEta->push_back(j.userFloat( (sPruned+sEta).Data() ));
-          prunedPhi->push_back(j.userFloat( (sPruned+sPhi).Data() ));
+          TString sNjettiness = TString("Njettiness") + sR0;
+          TLorentzVector p_tmp;
+          p_tmp.SetPtEtaPhiM(j.userFloat((sPruned+sPt).Data()),
+                              j.userFloat((sPruned+sEta).Data()),
+                              j.userFloat((sPruned+sPhi).Data()),
+                              j.userFloat((sPruned+sMass).Data()));
+          prunedMomentum->push_back(p_tmp);
+          p_tmp.SetPtEtaPhiM(j.userFloat((sTrimmed+sPt).Data()),
+                              j.userFloat((sTrimmed+sEta).Data()),
+                              j.userFloat((sTrimmed+sPhi).Data()),
+                              j.userFloat((sTrimmed+sMass).Data()));
+          trimmedMomentum->push_back(p_tmp);
+          p_tmp.SetPtEtaPhiM(j.userFloat((sSD+sPt).Data()),
+                              j.userFloat((sSD+sEta).Data()),
+                              j.userFloat((sSD+sPhi).Data()),
+                              j.userFloat((sSD+sMass).Data()));
+          sdMomentum->push_back(p_tmp);
           prunedJEC0->push_back(j.userFloat( (sPruned+sJEC0).Data() ));
-          trimmedPt->push_back(j.userFloat( (sTrimmed+sPt).Data() ));
-          trimmedEta->push_back(j.userFloat( (sTrimmed+sEta).Data() ));
-          trimmedPhi->push_back(j.userFloat( (sTrimmed+sPhi).Data() ));
           trimmedJEC0->push_back(j.userFloat( (sTrimmed+sJEC0).Data() ));
-          sdPt->push_back(j.userFloat( (sSD+sPt).Data() ));
-          sdEta->push_back(j.userFloat( (sSD+sEta).Data() ));
-          sdPhi->push_back(j.userFloat( (sSD+sPhi).Data() ));
           sdJEC0->push_back(j.userFloat( (sSD+sJEC0).Data() ));
+          tau1 -> push_back(j.userFloat( (sNjettiness+":tau1").Data() ));
+          tau2 -> push_back(j.userFloat( (sNjettiness+":tau2").Data() ));
+          tau3 -> push_back(j.userFloat( (sNjettiness+":tau3").Data() ));
+          // add tau4 for ttbar rejection?
+        } else {
+          tau1 -> push_back(j.userFloat("Njettiness:tau1"));
+          tau2 -> push_back(j.userFloat("Njettiness:tau2"));
+          tau3 -> push_back(j.userFloat("Njettiness:tau3"));
         }
 
         auto Subjets = j.subjets(SubjetsName);
@@ -454,8 +241,6 @@ void NeroFatJets::runBTagging(const pat::Jet* jet) {
       svP4_1 = vertex.p4();
       zRatio->push_back(reco::deltaR(flightDir0,flightDir1)*(svPt0->back())/(svP4_0+svP4_1).mass());
     }
-    if (cont==4)
-      break;
   }
   if (cont<2) {
     zRatio->push_back(-1.);
@@ -466,38 +251,190 @@ void NeroFatJets::runBTagging(const pat::Jet* jet) {
   svEnergyRatio->push_back(svEnergyRatio_tmp);
   svMass->push_back(svMass_tmp);
   svPt->push_back(svPt_tmp);
+  reco::TaggingVariableList svVars = svTagInfo->taggingVariables();
 
   // TRACK INFO
-  reco::TaggingVariableList ipVars = ipTagInfo->taggingVariables();
-  reco::TaggingVariableList svVars = svTagInfo->taggingVariables();
-  nTracks->push_back(ipTagInfo->selectedTracks().size());
-  storeTrkVars(ipVars, svVars);
-
-
+  reco::TrackKinematics allKinematics;
+  computeTrkVars(ipTagInfo, allKinematics);
 }
 
-void NeroFatJets::storeTrkVars(reco::TaggingVariableList &ipVars, reco::TaggingVariableList &svVars) {
-  trackMomentum->push_back( &(ipVars.getList(reco::btau::trackMomentum,false) );
-  trackEta->push_back( &(ipVars.getList(reco::btau::trackEta,false) );
-  trackPhi->push_back( &(ipVars.getList(reco::btau::trackPhi,false) );
-  trackPtRel->push_back( &(ipVars.getList(reco::btau::trackPtRel,false) );
-  trackPPar->push_back( &(ipVars.getList(reco::btau::trackPPar,false) );
-  trackEtaRel->push_back( &(ipVars.getList(reco::btau::trackEtaRel,false) );
-  trackDeltaR->push_back( &(ipVars.getList(reco::btau::trackDeltaR,false) );
-  trackPtRatio->push_back( &(ipVars.getList(reco::btau::trackPtRatio,false) );
-  trackPParRatio->push_back( &(ipVars.getList(reco::btau::trackPParRatio,false) );
-  trackSip2dVal->push_back( &(ipVars.getList(reco::btau::trackSip2dVal,false) );
-  trackSip2dSig->push_back( &(ipVars.getList(reco::btau::trackSip2dSig,false) );
-  trackSip3dVal->push_back( &(ipVars.getList(reco::btau::trackSip3dVal,false) );
-  trackSip3dSig->push_back( &(ipVars.getList(reco::btau::trackSip3dSig,false) );
-  trackDecayLenVal->push_back( &(ipVars.getList(reco::btau::trackDecayLenVal,false) );
-  trackDecayLenSig->push_back( &(ipVars.getList(reco::btau::trackDecayLenSig,false) );
-  trackJetDistVal->push_back( &(ipVars.getList(reco::btau::trackJetDistVal,false) );
-  trackJetDistSig->push_back( &(ipVars.getList(reco::btau::trackJetDistSig,false) );
-  trackChi2->push_back( &(ipVars.getList(reco::btau::trackChi2,false) );
-  trackNTotalHits->push_back( &(ipVars.getList(reco::btau::trackNTotalHits,false) );
-  trackNPixelHits->push_back( &(ipVars.getList(reco::btau::trackNPixelHits,false) );
+void NeroFatJets::computeTrkVars(const IPTagInfo * ipTagInfo, const SVTagInfo * SVTagInfo, reco::TrackKinematics & allKinematics) {
+  const reco::TaggingVariableList ipVars = ipTagInfo->taggingVariables();
+  nTracks->push_back(ipTagInfo->selectedTracks().size());
+  track_momentum->push_back( &(ipVars.getList(reco::btau::trackMomentum,false) );
+  track_eta->push_back( &(ipVars.getList(reco::btau::trackEta,false) );
+  track_phi->push_back( &(ipVars.getList(reco::btau::trackPhi,false) );
+  track_ptRel->push_back( &(ipVars.getList(reco::btau::trackPtRel,false) );
+  track_pPar->push_back( &(ipVars.getList(reco::btau::trackPPar,false) );
+  track_etaRel->push_back( &(ipVars.getList(reco::btau::trackEtaRel,false) );
+  track_deltaR->push_back( &(ipVars.getList(reco::btau::trackDeltaR,false) );
+  track_ptRatio->push_back( &(ipVars.getList(reco::btau::trackPtRatio,false) );
+  track_pParRatio->push_back( &(ipVars.getList(reco::btau::trackPParRatio,false) );
+  track_sip2dVal->push_back( &(ipVars.getList(reco::btau::trackSip2dVal,false) );
+  track_sip2dSig->push_back( &(ipVars.getList(reco::btau::trackSip2dSig,false) );
+  track_sip3dVal->push_back( &(ipVars.getList(reco::btau::trackSip3dVal,false) );
+  track_sip3dSig->push_back( &(ipVars.getList(reco::btau::trackSip3dSig,false) );
+  track_decayLenVal->push_back( &(ipVars.getList(reco::btau::trackDecayLenVal,false) );
+  track_decayLenSig->push_back( &(ipVars.getList(reco::btau::trackDecayLenSig,false) );
+  track_jetDistVal->push_back( &(ipVars.getList(reco::btau::trackJetDistVal,false) );
+  track_jetDistSig->push_back( &(ipVars.getList(reco::btau::trackJetDistSig,false) );
+  track_chi2->push_back( &(ipVars.getList(reco::btau::trackChi2,false) );
+  track_nTotalHits->push_back( &(ipVars.getList(reco::btau::trackNTotalHits,false) );
+  track_nPixelHits->push_back( &(ipVars.getList(reco::btau::trackNPixelHits,false) );
 
+  std::vector<float> tmp_dxy;
+  std::vector<float> tmp_dz;
+  std::vector<float> tmp_IP2D ;
+  std::vector<float> tmp_IP2Dsig ;
+  std::vector<float> tmp_IP ;
+  std::vector<float> tmp_IPsig ;
+  std::vector<float> tmp_IP2Derr ;
+  std::vector<float> tmp_IPerr ;
+  std::vector<float> tmp_prob ;
+  std::vector<float> tmp_PVWeight ;
+  std::vector<float> tmp_SVWeight ;
+  std::vector<int> tmp_nHitStrip ;
+  std::vector<int> tmp_nHitTIB ;
+  std::vector<int> tmp_nHitTID ;
+  std::vector<int> tmp_nHitTOB ;
+  std::vector<int> tmp_nHitTEC ;
+  std::vector<int> tmp_nHitPXB ;
+  std::vector<int> tmp_nHitPXF ;
+  std::vector<int> tmp_isHitL1 ;
+  std::vector<int> tmp_PV ;
+  std::vector<int> tmp_fromSV ;
+  std::vector<int> tmp_SV ;
+  const Tracks & selectedTracks( ipTagInfo->selectedTracks() );
+  unsigned int trackSize = selectedTracks.size();
+  for (unsigned int itt=0; itt < trackSize; ++itt) {
+    TrackData* trackData = new TrackData;
+    const reco::Track & ptrack = *(reco::btag::toTrack(selectedTracks[itt]));
+    const TrackRef ptrackRef = selectedTracks[itt];
+
+    tmp_dxy.push_back(ptrack.dxy(pv->position()));
+    tmp_dz.push_back(ptrack.dz(pv->position()));
+    tmp_IP2D.push_back(ipTagInfo->impactParameterData()[itt].ip2d.value());
+    tmp_IP2Dsig.push_back(ipTagInfo->impactParameterData()[itt].ip2d.significance());
+    tmp_IP.push_back(ipTagInfo->impactParameterData()[itt].ip3d.value());
+    tmp_IPsig.push_back(ipTagInfo->impactParameterData()[itt].ip3d.significance());
+    tmp_IP2Derr.push_back(ipTagInfo->impactParameterData()[itt].ip2d.error());
+    tmp_IPerr.push_back(ipTagInfo->impactParameterData()[itt].ip3d.error());
+    tmp_prob.push_back(ipTagInfo->probabilities(0)[itt]);
+
+    tmp_nHitStrip.push_back(ptrack.hitPattern().numberOfValidStripHits());
+    tmp_nHitTIB.push_back(ptrack.hitPattern().numberOfValidStripTIBHits());
+    tmp_nHitTID.push_back(ptrack.hitPattern().numberOfValidStripTIDHits());
+    tmp_nHitTOB.push_back(ptrack.hitPattern().numberOfValidStripTOBHits());
+    tmp_nHitTEC.push_back(ptrack.hitPattern().numberOfValidStripTECHits());
+    tmp_nHitPXB.push_back(ptrack.hitPattern().numberOfValidPixelBarrelHits());
+    tmp_nHitPXF.push_back(ptrack.hitPattern().numberOfValidPixelEndcapHits());
+    tmp_isHitL1.push_back(ptrack.hitPattern().hasValidHitInFirstPixelBarrel());
+    int PV, fromSV, SV;
+    float PVWeight, SVWeight;
+    setTracksPV(ptrackRef, fPVs, PV, PVWeight);
+    tmp_PV.push_back(PV);
+    tmp_PVWeight.push_back(PVWeight);
+    if (!PV && PVWeight > 0)
+      allKinematics.add(ptrack,PVWeight);
+    if (inJet.hasTagInfo("pfInclusiveSecondaryVertexFinder")) {
+      setTracksSV(ptrackRef,svTagInfo,fromSV, SV, SVWeight);
+    } else {
+      fromSV = 0;
+      SV = -1;
+      SVWeight = 0;
+    }
+    tmp_fromSV.push_back(fromSV);
+    tmp_SV.push_back(SV);
+    tmp_SVWeight.push_back(SVWeight);
+  }
+  track_dxy->push_back(&tmp_dxy);
+  track_dz->push_back(&tmp_dz);
+  track_IP2D->push_back(&tmp_IP2D);
+  track_IP2Dsig->push_back(&tmp_IP2Dsig);
+  track_IP->push_back(&tmp_IP);
+  track_IPsig->push_back(&tmp_IPsig);
+  track_IP2Derr->push_back(&tmp_IP2Derr);
+  track_IPerr->push_back(&tmp_IPerr);
+  track_prob->push_back(&tmp_prob);
+  track_PVWeight->push_back(&tmp_PVWeight);
+  track_SVWeight->push_back(&tmp_SVWeight);
+  track_nHitStrip->push_back(&tmp_nHitStrip);
+  track_nHitTIB->push_back(&tmp_nHitTIB);
+  track_nHitTID->push_back(&tmp_nHitTID);
+  track_nHitTOB->push_back(&tmp_nHitTOB);
+  track_nHitTEC->push_back(&tmp_nHitTEC);
+  track_nHitPXB->push_back(&tmp_nHitPXB);
+  track_nHitPXF->push_back(&tmp_nHitPXF);
+  track_isHitL1->push_back(&tmp_isHitL1);
+  track_PV->push_back(&tmp_PV);
+  track_fromSV->push_back(&tmp_fromSV);
+  track_SV->push_back(&tmp_SV);
+}
+
+
+void NeroFatJets::setTracksSV (const TrackRef & trackRef, const SVTagInfo * svTagInfo, int & isFromSV, int & iSV, float & SVweight)
+{
+  isFromSV = 0;
+  iSV = -1;
+  SVweight = 0.;
+  typedef std::vector<reco::CandidatePtr>::const_iterator IT;
+  size_t nSV = svTagInfo->nVertices();
+  for(size_t iv=0; iv<nSV; ++iv)  {
+    const recoVertexPtr & vtx = svTagInfo->secondaryVertex(iv);
+    // one of the tracks in the vertex is the same as the track considered in the function
+    const std::vector<reco::CandidatePtr> & tracks = vtx.daughterPtrVector();
+    if( std::find(tracks.begin(),tracks.end(),trackRef) != tracks.end() )    {
+      SVweight = 1.;
+      isFromSV = 1;
+      iSV = iv;
+    // select the first vertex for which the track is used in the fit
+    }
+    // (reco::VertexCompositePtrCandidate does not store track weights so can't select the vertex for which the track has the highest weight)
+    if(iSV>=0)
+      break;
+  }
+}
+
+void NeroFatJets::setTracksPV(const TrackRef & trackRef, const edm::Handle<reco::VertexCollection> & pvHandle, int & iPV, float & PVweight)
+{
+  iPV = -1;
+  PVweight = 0.;
+  const reco::PFCandidate * pfcand = dynamic_cast<const reco::PFCandidate *>(trackRef.get());
+  setTracksPVBase(pfcand->trackRef(), pvHandle, iPV, PVweight);
+}
+
+void NeroFatJets::setTracksPVBase(const reco::TrackRef & trackRef, const edm::Handle<reco::VertexCollection> & pvHandle, int & iPV, float & PVweight)
+{
+  iPV = -1;
+  PVweight = 0.;
+  const reco::TrackBaseRef trackBaseRef( trackRef );
+  typedef reco::VertexCollection::const_iterator IV;
+  typedef reco::Vertex::trackRef_iterator IT;
+  for(IV iv=pvHandle->begin(); iv!=pvHandle->end(); ++iv)
+  {
+    const reco::Vertex & vtx = *iv;
+    // loop over tracks in vertices
+    for(IT it=vtx.tracks_begin(); it!=vtx.tracks_end(); ++it)
+    {
+      const reco::TrackBaseRef & baseRef = *it;
+      // one of the tracks in the vertex is the same as the track considered in the function
+      if( baseRef == trackBaseRef )
+      {
+        float w = vtx.trackWeight(baseRef);
+        // select the vertex for which the track has the highest weight
+        if( w > PVweight )
+        {
+          PVweight = w;
+          iPV = ( iv - pvHandle->begin() );
+          break;
+        }
+      }
+    }
+  }
+}
+
+
+void NeroFatJets::storeSVVars(reco::TaggingVariableList &svVars) {
 
 }
 
