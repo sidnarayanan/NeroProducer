@@ -233,8 +233,9 @@ Nero::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     for(auto o : obj)
     {
         if (VERBOSE){sw_.Reset(); sw_.Start();}
-        if (o->name()=="NeroFatJets" && o->analyze(iEvent,iSetup)) return; // fatjet analyzer needs iSetup info for substructure
-        else if (o->analyze(iEvent) ) return; // analyze return 0 on success (VTX ..)
+//        if (o->name()=="NeroFatJets" && o->analyze(iEvent,iSetup)) return; // fatjet analyzer needs iSetup info for substructure
+//        else if (o->analyze(iEvent) ) return; // analyze return 0 on success (VTX ..)
+        if(o->analyze(iEvent)) return; // will fix above later
 
         if (VERBOSE){sw_.Stop(); cout<< "[Nero]::[analyze] object "<<o->name()<<" took:"<< sw_.CpuTime()<< "CPU Time and "<<sw_.RealTime()<<"RealTime"<<endl;}
     }

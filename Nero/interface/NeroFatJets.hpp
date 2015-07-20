@@ -23,7 +23,7 @@ class NeroFatJets : virtual public NeroCollection,
       typedef typename IPTagInfo::input_container::value_type TrackRef;
       NeroFatJets(double r0);
       ~NeroFatJets();
-      int analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup);
+      int analyze(const edm::Event& iEvent);
       virtual inline string name(){return "NeroFatJets";};
       void setBranchAddresses(TTree *);
       void defineBranches(TTree *);
@@ -54,17 +54,17 @@ class NeroFatJets : virtual public NeroCollection,
                                             float & tau1,
                                             float & tau2,
                                             std::vector<fastjet::PseudoJet> &currentAxes);
-      void setTracksPV(const TrackRef & trackRef, const edm::Handle<reco::VertexCollection> & pvHandle, int & iPV, float & PVweight);
-      void setTracksPVBase(const reco::TrackRef & trackRef, const edm::Handle<reco::VertexCollection> & pvHandle, int & iPV, float & PVweight);
       void computeTrkVars(const IPTagInfo * ipTagInfo, const SVTagInfo * svTagInfo, reco::TrackKinematics & allKinematics);
       void computeSVVars(const IPTagInfo * ipTagInfo, const SVTagInfo * svTagInfo);
       void setTracksPV(const TrackRef & trackRef, const edm::Handle<reco::VertexCollection> & pvHandle, int & iPV, float & PVweight);
       void setTracksPVBase(const reco::TrackRef & trackRef, const edm::Handle<reco::VertexCollection> & pvHandle, int & iPV, float & PVweight);
       void setTracksSV (const TrackRef & trackRef, const SVTagInfo * svTagInfo, int & isFromSV, int & iSV, float & SVweight);
+      template<typename T>  void fillTaggingVar(reco::TaggingVariableList const & varList, std::vector<vector<T>*>* target, reco::btau::TaggingVariableName kVar);
+
 
 
     protected:
-      const GenericMVAJetTagComputer *computer;
+      //const GenericMVAJetTagComputer *computer;
       std::string SubjetsName = "SubJets";
       float R0                = -1;
       fastjet::contrib::Njettiness njettiness;
@@ -84,7 +84,7 @@ class NeroFatJets : virtual public NeroCollection,
       std::vector<std::vector<float>*> *svEnergyRatio;
       std::vector<std::vector<float>*> *svPt;
 
-      std::vector<vector<float>*> *track_p;       // per track_ in fatjet
+      std::vector<vector<float>*> *track_momentum;       // per track_ in fatjet
       std::vector<vector<float>*> *track_eta;
       std::vector<vector<float>*> *track_phi;
       std::vector<vector<float>*> *track_ptRel;
@@ -102,8 +102,8 @@ class NeroFatJets : virtual public NeroCollection,
       std::vector<vector<float>*> *track_jetDistVal;
       std::vector<vector<float>*> *track_jetDistSig;
       std::vector<vector<float>*> *track_chi2;
-      std::vector<vector<int>*> *track_nTotalHits;
-      std::vector<vector<int>*> *track_nPixelHits;
+      std::vector<vector<float>*> *track_nTotalHits;
+      std::vector<vector<float>*> *track_nPixelHits;
       std::vector<vector<float>*> *track_dxy;
       std::vector<vector<float>*> *track_dz;
       std::vector<vector<float>*> *track_IP2D;
@@ -139,7 +139,7 @@ class NeroFatJets : virtual public NeroCollection,
 
 };
 
-oid NeroFatJets::clear() {
+void NeroFatJets::clear() {
   BareFatJets::clear();
   tau1IVF->clear();
   tau2IVF->clear();
@@ -237,8 +237,8 @@ void NeroFatJets::defineBranches(TTree * t){
   track_jetDistVal = new vector<vector<float>*>;
   track_jetDistSig = new vector<vector<float>*>;
   track_chi2 = new vector<vector<float>*>;
-  track_nTotalHits = new vector<vector<int>*>;
-  track_nPixelHits = new vector<vector<int>*>;
+  track_nTotalHits = new vector<vector<float>*>;
+  track_nPixelHits = new vector<vector<float>*>;
   track_dxy = new vector<vector<float>*>;
   track_dz = new vector<vector<float>*>;
   track_IP2D = new vector<vector<float>*>;
@@ -296,8 +296,8 @@ void NeroFatJets::defineBranches(TTree * t){
   t->Branch((prefix+string("_track_jetDistVal")).c_str(),"vector<vector<float>*>",&track_jetDistVal);
   t->Branch((prefix+string("_track_jetDistSig")).c_str(),"vector<vector<float>*>",&track_jetDistSig);
   t->Branch((prefix+string("_track_chi2")).c_str(),"vector<vector<float>*>",&track_chi2);
-  t->Branch((prefix+string("_track_nTotalHits")).c_str(),"vector<vector<int>*>",&track_nTotalHits);
-  t->Branch((prefix+string("_track_nPixelHits")).c_str(),"vector<vector<int>*>",&track_nPixelHits);
+  t->Branch((prefix+string("_track_nTotalHits")).c_str(),"vector<vector<float>*>",&track_nTotalHits);
+  t->Branch((prefix+string("_track_nPixelHits")).c_str(),"vector<vector<float>*>",&track_nPixelHits);
   t->Branch((prefix+string("_track_dxy")).c_str(),"vector<vector<float>*>",&track_dxy);
   t->Branch((prefix+string("_track_dz")).c_str(),"vector<vector<float>*>",&track_dz);
   t->Branch((prefix+string("_track_IP2D")).c_str(),"vector<vector<float>*>",&track_IP2D);
@@ -360,8 +360,8 @@ void NeroFatJets::setBranchAddresses(TTree *t){
   track_jetDistVal = new vector<vector<float>*>;
   track_jetDistSig = new vector<vector<float>*>;
   track_chi2 = new vector<vector<float>*>;
-  track_nTotalHits = new vector<vector<int>*>;
-  track_nPixelHits = new vector<vector<int>*>;
+  track_nTotalHits = new vector<vector<float>*>;
+  track_nPixelHits = new vector<vector<float>*>;
   track_dxy = new vector<vector<float>*>;
   track_dz = new vector<vector<float>*>;
   track_IP2D = new vector<vector<float>*>;

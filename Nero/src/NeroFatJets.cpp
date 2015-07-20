@@ -42,17 +42,7 @@
 
 NeroFatJets::NeroFatJets(double r0) : BareFatJets(),
                              R0(r0),
-                             njettiness(fastjet::contrib::OnePass_KT_Axes(), fastjet::contrib::NormalizedMeasure(1.0,R0)),
-                             tau1IVF(0),
-                             tau2IVF(0),
-                             nSV(0),
-                             zRatio(0),
-                             tauDot(0),
-                             svMass0(0),
-                             svEnergyRatio0(0),
-                             svEnergyRatio1(0),
-                             svPt0(0),
-                             computer(0)
+                             njettiness(fastjet::contrib::OnePass_KT_Axes(), fastjet::contrib::NormalizedMeasure(1.0,R0))
 {
 }
 
@@ -60,7 +50,7 @@ NeroFatJets::~NeroFatJets(){
 }
 
 
-int NeroFatJets::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup){
+int NeroFatJets::analyze(const edm::Event& iEvent){
 
     if ( mOnlyMc  ) return 0;
 
@@ -156,18 +146,9 @@ void NeroFatJets::runBTagging(const pat::Jet* jet) {
   tau1IVF->push_back(tau1IVF_tmp);
   tau2IVF->push_back(tau2IVF_tmp);
 
-  const Tracks & selectedTracks( ipTagInfo->selectedTracks() );
+  // TRACK INFO
   reco::TrackKinematics allKinematics;
-  unsigned int trackSize = selectedTracks.size();
-  for (unsigned int itt=0; itt < trackSize; ++itt) {
-    const reco::Track & ptrack = *(reco::btag::toTrack(selectedTracks[itt]));
-    const TrackRef ptrackRef = selectedTracks[itt];
-    int trackPV;
-    float trackPVWeight;
-    setTracksPV(ptrackRef,primaryVertices,trackPV, trackPVWeight);
-    if (!trackPV && trackPVWeight > 0)
-      allKinematics.add(ptrack,trackPVWeight);
-  }
+  computeTrkVars(ipTagInfo, svTagInfo, allKinematics);
   math::XYZTLorentzVector allSum =  allKinematics.weightedVectorSum() ; //allKinematics.vectorSum()
 
   std::map<double, unsigned int> VTXmass;
@@ -221,7 +202,7 @@ void NeroFatJets::runBTagging(const pat::Jet* jet) {
     const Vertex &vertex = svTagInfo->secondaryVertex(iVtx->second);
     float SV_EnergyRatio = svtxEnergyRatio[iVtx->second];
     svEnergyRatio_tmp->push_back(SV_EnergyRatio);
-    svMass_tmp->push_back(vertex.p4().mass);
+    svMass_tmp->push_back(vertex.p4().mass());
     svPt_tmp->push_back(vertex.p4().pt());
     if (cont==1)
     {
@@ -236,10 +217,9 @@ void NeroFatJets::runBTagging(const pat::Jet* jet) {
     }
     if (cont==2)
     {
-      svEnergyRatio1->push_back(SV_EnergyRatio);
       flightDir1 = svTagInfo->flightDirection(iVtx->second);
       svP4_1 = vertex.p4();
-      zRatio->push_back(reco::deltaR(flightDir0,flightDir1)*(svPt0->back())/(svP4_0+svP4_1).mass());
+      zRatio->push_back(reco::deltaR(flightDir0,flightDir1)*(svP4_0.pt())/(svP4_0+svP4_1).mass());
     }
   }
   if (cont<2) {
@@ -252,35 +232,40 @@ void NeroFatJets::runBTagging(const pat::Jet* jet) {
   svMass->push_back(svMass_tmp);
   svPt->push_back(svPt_tmp);
   reco::TaggingVariableList svVars = svTagInfo->taggingVariables();
-
-  // TRACK INFO
-  reco::TrackKinematics allKinematics;
-  computeTrkVars(ipTagInfo, allKinematics);
 }
 
-void NeroFatJets::computeTrkVars(const IPTagInfo * ipTagInfo, const SVTagInfo * SVTagInfo, reco::TrackKinematics & allKinematics) {
+template<typename T>
+void NeroFatJets::fillTaggingVar(reco::TaggingVariableList const & varList, std::vector<vector<T>*>* target, reco::btau::TaggingVariableName kVar) {
+  std::vector<T> * tmp_vec = new vector<T>;
+  std::vector<T> vals = varList.getList(kVar,false);
+  std::copy(vals.begin(), vals.end(), back_inserter(*tmp_vec));
+  target->push_back(tmp_vec);
+}
+
+void NeroFatJets::computeTrkVars(const IPTagInfo * ipTagInfo, const SVTagInfo * svTagInfo, reco::TrackKinematics & allKinematics) {
   const reco::TaggingVariableList ipVars = ipTagInfo->taggingVariables();
   nTracks->push_back(ipTagInfo->selectedTracks().size());
-  track_momentum->push_back( &(ipVars.getList(reco::btau::trackMomentum,false) );
-  track_eta->push_back( &(ipVars.getList(reco::btau::trackEta,false) );
-  track_phi->push_back( &(ipVars.getList(reco::btau::trackPhi,false) );
-  track_ptRel->push_back( &(ipVars.getList(reco::btau::trackPtRel,false) );
-  track_pPar->push_back( &(ipVars.getList(reco::btau::trackPPar,false) );
-  track_etaRel->push_back( &(ipVars.getList(reco::btau::trackEtaRel,false) );
-  track_deltaR->push_back( &(ipVars.getList(reco::btau::trackDeltaR,false) );
-  track_ptRatio->push_back( &(ipVars.getList(reco::btau::trackPtRatio,false) );
-  track_pParRatio->push_back( &(ipVars.getList(reco::btau::trackPParRatio,false) );
-  track_sip2dVal->push_back( &(ipVars.getList(reco::btau::trackSip2dVal,false) );
-  track_sip2dSig->push_back( &(ipVars.getList(reco::btau::trackSip2dSig,false) );
-  track_sip3dVal->push_back( &(ipVars.getList(reco::btau::trackSip3dVal,false) );
-  track_sip3dSig->push_back( &(ipVars.getList(reco::btau::trackSip3dSig,false) );
-  track_decayLenVal->push_back( &(ipVars.getList(reco::btau::trackDecayLenVal,false) );
-  track_decayLenSig->push_back( &(ipVars.getList(reco::btau::trackDecayLenSig,false) );
-  track_jetDistVal->push_back( &(ipVars.getList(reco::btau::trackJetDistVal,false) );
-  track_jetDistSig->push_back( &(ipVars.getList(reco::btau::trackJetDistSig,false) );
-  track_chi2->push_back( &(ipVars.getList(reco::btau::trackChi2,false) );
-  track_nTotalHits->push_back( &(ipVars.getList(reco::btau::trackNTotalHits,false) );
-  track_nPixelHits->push_back( &(ipVars.getList(reco::btau::trackNPixelHits,false) );
+
+  fillTaggingVar(ipVars,track_momentum,reco::btau::trackMomentum);
+  fillTaggingVar(ipVars,track_eta,reco::btau::trackEta);
+  fillTaggingVar(ipVars,track_phi,reco::btau::trackPhi);
+  fillTaggingVar(ipVars,track_ptRel,reco::btau::trackPtRel);
+  fillTaggingVar(ipVars,track_pPar,reco::btau::trackPPar);
+  fillTaggingVar(ipVars,track_etaRel,reco::btau::trackEtaRel);
+  fillTaggingVar(ipVars,track_deltaR,reco::btau::trackDeltaR);
+  fillTaggingVar(ipVars,track_ptRatio,reco::btau::trackPtRatio);
+  fillTaggingVar(ipVars,track_pParRatio,reco::btau::trackPParRatio);
+  fillTaggingVar(ipVars,track_sip2dVal,reco::btau::trackSip2dVal);
+  fillTaggingVar(ipVars,track_sip2dSig,reco::btau::trackSip2dSig);
+  fillTaggingVar(ipVars,track_sip3dVal,reco::btau::trackSip3dVal);
+  fillTaggingVar(ipVars,track_sip3dSig,reco::btau::trackSip3dSig);
+  fillTaggingVar(ipVars,track_decayLenVal,reco::btau::trackDecayLenVal);
+  fillTaggingVar(ipVars,track_decayLenSig,reco::btau::trackDecayLenSig);
+  fillTaggingVar(ipVars,track_jetDistVal,reco::btau::trackJetDistVal);
+  fillTaggingVar(ipVars,track_jetDistSig,reco::btau::trackJetDistSig);
+  fillTaggingVar(ipVars,track_chi2,reco::btau::trackChi2);
+  fillTaggingVar(ipVars,track_nTotalHits,reco::btau::trackNTotalHits);
+  fillTaggingVar(ipVars,track_nPixelHits,reco::btau::trackNPixelHits);
 
   std::vector<float> tmp_dxy;
   std::vector<float> tmp_dz;
@@ -306,8 +291,8 @@ void NeroFatJets::computeTrkVars(const IPTagInfo * ipTagInfo, const SVTagInfo * 
   std::vector<int> tmp_SV ;
   const Tracks & selectedTracks( ipTagInfo->selectedTracks() );
   unsigned int trackSize = selectedTracks.size();
+  const reco::Vertex *pv = &(*primaryVertices->begin());
   for (unsigned int itt=0; itt < trackSize; ++itt) {
-    TrackData* trackData = new TrackData;
     const reco::Track & ptrack = *(reco::btag::toTrack(selectedTracks[itt]));
     const TrackRef ptrackRef = selectedTracks[itt];
 
@@ -331,14 +316,14 @@ void NeroFatJets::computeTrkVars(const IPTagInfo * ipTagInfo, const SVTagInfo * 
     tmp_isHitL1.push_back(ptrack.hitPattern().hasValidHitInFirstPixelBarrel());
     int PV, fromSV, SV;
     float PVWeight, SVWeight;
-    setTracksPV(ptrackRef, fPVs, PV, PVWeight);
+    setTracksPV(ptrackRef, primaryVertices, PV, PVWeight);
     tmp_PV.push_back(PV);
     tmp_PVWeight.push_back(PVWeight);
     if (!PV && PVWeight > 0)
       allKinematics.add(ptrack,PVWeight);
-    if (inJet.hasTagInfo("pfInclusiveSecondaryVertexFinder")) {
+    try {
       setTracksSV(ptrackRef,svTagInfo,fromSV, SV, SVWeight);
-    } else {
+    } catch(std::exception& e) {
       fromSV = 0;
       SV = -1;
       SVWeight = 0;
@@ -371,6 +356,8 @@ void NeroFatJets::computeTrkVars(const IPTagInfo * ipTagInfo, const SVTagInfo * 
   track_SV->push_back(&tmp_SV);
 }
 
+void NeroFatJets::computeSVVars(const IPTagInfo * ipTagInfo, const SVTagInfo * SVTagInfo) {
+}
 
 void NeroFatJets::setTracksSV (const TrackRef & trackRef, const SVTagInfo * svTagInfo, int & isFromSV, int & iSV, float & SVweight)
 {
@@ -380,7 +367,7 @@ void NeroFatJets::setTracksSV (const TrackRef & trackRef, const SVTagInfo * svTa
   typedef std::vector<reco::CandidatePtr>::const_iterator IT;
   size_t nSV = svTagInfo->nVertices();
   for(size_t iv=0; iv<nSV; ++iv)  {
-    const recoVertexPtr & vtx = svTagInfo->secondaryVertex(iv);
+    const Vertex & vtx = svTagInfo->secondaryVertex(iv);
     // one of the tracks in the vertex is the same as the track considered in the function
     const std::vector<reco::CandidatePtr> & tracks = vtx.daughterPtrVector();
     if( std::find(tracks.begin(),tracks.end(),trackRef) != tracks.end() )    {
@@ -433,66 +420,6 @@ void NeroFatJets::setTracksPVBase(const reco::TrackRef & trackRef, const edm::Ha
   }
 }
 
-
-void NeroFatJets::storeSVVars(reco::TaggingVariableList &svVars) {
-
-}
-
-void NeroFatJets::setTracksPVBase(const reco::TrackRef & trackRef, const edm::Handle<reco::VertexCollection> & pvHandle, int & iPV, float & PVweight)
-{
-  iPV = -1;
-  PVweight = 0.;
-
-  const reco::TrackBaseRef trackBaseRef( trackRef );
-
-  typedef reco::VertexCollection::const_iterator IV;
-  typedef reco::Vertex::trackRef_iterator IT;
-
-  for(IV iv=pvHandle->begin(); iv!=pvHandle->end(); ++iv)
-  {
-    const reco::Vertex & vtx = *iv;
-    // loop over tracks in vertices
-    for(IT it=vtx.tracks_begin(); it!=vtx.tracks_end(); ++it)
-    {
-      const reco::TrackBaseRef & baseRef = *it;
-      // one of the tracks in the vertex is the same as the track considered in the function
-      if( baseRef == trackBaseRef )
-      {
-        float w = vtx.trackWeight(baseRef);
-        // select the vertex for which the track has the highest weight
-        if( w > PVweight )
-        {
-          PVweight = w;
-          iPV = ( iv - pvHandle->begin() );
-          break;
-        }
-      }
-    }
-  }
-}
-
-void NeroFatJets::setTracksPV(const TrackRef & trackRef, const edm::Handle<reco::VertexCollection> & pvHandle, int & iPV, float & PVweight)
-{
-  iPV = -1;
-  PVweight = 0.;
-
-  const pat::PackedCandidate * pcand = dynamic_cast<const pat::PackedCandidate *>(trackRef.get());
-
-  if(pcand) // MiniAOD case
-  {
-    if( pcand->fromPV() == pat::PackedCandidate::PVUsedInFit )
-    {
-      iPV = 0;
-      PVweight = 1.;
-    }
-  }
-  else
-  {
-    const reco::PFCandidate * pfcand = dynamic_cast<const reco::PFCandidate *>(trackRef.get());
-
-    setTracksPVBase(pfcand->trackRef(), pvHandle, iPV, PVweight);
-  }
-}
 
 void NeroFatJets::vertexKinematicsAndCharge(const Vertex & vertex, reco::TrackKinematics & vertexKinematics, Int_t & charge)
 {
