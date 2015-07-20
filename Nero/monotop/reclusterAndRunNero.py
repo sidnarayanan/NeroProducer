@@ -783,7 +783,7 @@ process.p = cms.Path(
                 # process.selectedPatJetsPrunedPFCHS8*
                 # process.selectedPatJetsPrunedSubjetsPFCHS8*
                 # process.selectedPatJetsPrunedPFCHSPacked8*
-                # process.packedPatJetsPFCHS8*
+                process.packedPatJetsPFCHS8*
                 # process.selectedPatJetsPFCHS15*
                 # process.selectedPatJetsSoftDropPFCHS15*
                 # process.selectedPatJetsSoftDropSubjetsPFCHS15*
@@ -791,7 +791,7 @@ process.p = cms.Path(
                 # process.selectedPatJetsPrunedPFCHS15*
                 # process.selectedPatJetsPrunedSubjetsPFCHS15*
                 # process.selectedPatJetsPrunedPFCHSPacked15*
-                # process.packedPatJetsPFCHS15 *
+                process.packedPatJetsPFCHS15 *
                 process.QGTagger *
                 process.egmGsfElectronIDSequence *
                 process.egmPhotonIDSequence *

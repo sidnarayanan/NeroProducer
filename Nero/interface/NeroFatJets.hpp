@@ -6,6 +6,7 @@
 #include "RecoBTag/SecondaryVertex/interface/TemplatedSimpleSecondaryVertexComputer.h"
 #include "DataFormats/BTauReco/interface/CandIPTagInfo.h"
 #include "DataFormats/BTauReco/interface/TrackIPTagInfo.h"
+#include "RecoBTag/SecondaryVertex/interface/TrackKinematics.h"
 #include "DataFormats/BTauReco/interface/CandSoftLeptonTagInfo.h"
 #include "fastjet/PseudoJet.hh"
 #include "fastjet/contrib/Njettiness.hh"
@@ -22,7 +23,7 @@ class NeroFatJets : virtual public NeroCollection,
       typedef typename IPTagInfo::input_container::value_type TrackRef;
       NeroFatJets(double r0);
       ~NeroFatJets();
-      int analyze(const edm::Event& iEvent);
+      int analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup);
       virtual inline string name(){return "NeroFatJets";};
       void setBranchAddresses(TTree *);
       void defineBranches(TTree *);
@@ -46,7 +47,7 @@ class NeroFatJets : virtual public NeroCollection,
       void SetR0 (float n)                { R0 = n;             }
       float GetR0()                       { return R0;          }
 
-      void doBTagging(const pat::Jet* jet);
+      void runBTagging(const pat::Jet* jet);
       void vertexKinematicsAndCharge(const Vertex & vertex, reco::TrackKinematics & vertexKinematics, Int_t & charge);
       void recalcNsubjettiness(const pat::Jet &jet,
                                             const SVTagInfo &svTagInfo,
@@ -58,21 +59,49 @@ class NeroFatJets : virtual public NeroCollection,
 
 
     protected:
+      const GenericMVAJetTagComputer *computer;
       std::string SubjetsName = "SubJets";
       float R0                = -1;
       fastjet::contrib::Njettiness njettiness;
       std::string prefix = "fatjet";
 
-
-      std::vector<float> *tau1IVF;
+        /////////////////////////////////
+       //       btagging vars         //
+      /////////////////////////////////
+      std::vector<float> *tau1IVF;                       // per fatjet
       std::vector<float> *tau2IVF;
       std::vector<unsigned int> *nSV;
       std::vector<float> *zRatio;
       std::vector<float> *tauDot;
-      std::vector<float> *svMass0;
-      std::vector<float> *svEnergyRatio0;
-      std::vector<float> *svEnergyRatio1;
-      std::vector<float> *svPt0;
+      std::vector<int> *nTracks;
+
+      std::vector<std::vector<float>*> *svMass;          // per secondary vertex in fatjet (but no more than 4 saved)
+      std::vector<std::vector<float>*> *svEnergyRatio;
+      std::vector<std::vector<float>*> *svPt;
+
+      std::vector<vector<float>*> *trackMomentum;       // per track in fatjet
+      std::vector<vector<float>*> *trackEta;
+      std::vector<vector<float>*> *trackPhi;
+      std::vector<vector<float>*> *trackPtRel;
+      std::vector<vector<float>*> *trackPPar;
+      std::vector<vector<float>*> *trackEtaRel;
+      std::vector<vector<float>*> *trackDeltaR;
+      std::vector<vector<float>*> *trackPtRatio;
+      std::vector<vector<float>*> *trackPParRatio;
+      std::vector<vector<float>*> *trackSip2dVal;
+      std::vector<vector<float>*> *trackSip2dSig;
+      std::vector<vector<float>*> *trackSip3dVal;
+      std::vector<vector<float>*> *trackSip3dSig;
+      std::vector<vector<float>*> *trackDecayLenVal;
+      std::vector<vector<float>*> *trackDecayLenSig;
+      std::vector<vector<float>*> *trackJetDistVal;
+      std::vector<vector<float>*> *trackJetDistSig;
+      std::vector<vector<float>*> *trackChi2;
+      std::vector<vector<int>*> *trackNTotalHits;
+      std::vector<vector<int>*> *trackNPixelHits;
+
+
+      //grooming vars
       std::vector<float> *prunedPt;
       std::vector<float> *prunedEta;
       std::vector<float> *prunedPhi;
