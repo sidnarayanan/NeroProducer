@@ -80,11 +80,7 @@ class NeroFatJets : virtual public NeroCollection,
       std::vector<float> *tauDot;
       std::vector<int> *nTracks;
 
-      std::vector<std::vector<float>*> *svMass;          // per secondary vertex in fatjet (but no more than 4 saved)
-      std::vector<std::vector<float>*> *svEnergyRatio;
-      std::vector<std::vector<float>*> *svPt;
-
-      std::vector<vector<float>*> *track_momentum;       // per track_ in fatjet
+      std::vector<vector<float>*> *track_momentum;       // per track in fatjet
       std::vector<vector<float>*> *track_eta;
       std::vector<vector<float>*> *track_phi;
       std::vector<vector<float>*> *track_ptRel;
@@ -127,6 +123,25 @@ class NeroFatJets : virtual public NeroCollection,
       std::vector<vector<int>*> *track_PV;
       std::vector<vector<int>*> *track_fromSV;
       std::vector<vector<int>*> *track_SV;
+
+      std::vector<vector<float>*> *sv_mass;                 // per secondary vertex  in fatjet
+      std::vector<vector<float>*> *sv_pt;
+      std::vector<vector<float>*> *sv_eta;
+      std::vector<vector<float>*> *sv_phi;
+      std::vector<vector<float>*> *sv_energyRatio;
+      std::vector<vector<int>*> *sv_charge;
+      std::vector<vector<float>*> *sv_dirX;
+      std::vector<vector<float>*> *sv_dirY;
+      std::vector<vector<float>*> *sv_dirZ;
+      std::vector<vector<float>*> *sv_deltaRJet;
+      std::vector<vector<float>*> *sv_deltaRSumJet;
+      std::vector<vector<float>*> *sv_deltaRSumDir;
+      std::vector<vector<float>*> *sv_vtxDistJetAxis;
+      std::vector<vector<float>*> *sv_flight;
+      std::vector<vector<float>*> *sv_flightErr;
+      std::vector<vector<float>*> *sv_flight2D;
+      std::vector<vector<float>*> *sv_flight2DErr;
+      std::vector<vector<float>*> *sv_nTrk;
 
 
       //grooming vars
@@ -199,6 +214,24 @@ void NeroFatJets::clear() {
   track_PV->clear();
   track_fromSV->clear();
   track_SV->clear();
+  sv_mass->clear();
+  sv_pt->clear();
+  sv_eta->clear();
+  sv_phi->clear();
+  sv_energyRatio->clear();
+  sv_charge->clear();
+  sv_dirX->clear();
+  sv_dirY->clear();
+  sv_dirZ->clear();
+  sv_deltaRJet->clear();
+  sv_deltaRSumJet->clear();
+  sv_deltaRSumDir->clear();
+  sv_vtxDistJetAxis->clear();
+  sv_flight->clear();
+  sv_flightErr->clear();
+  sv_flight2D->clear();
+  sv_flight2DErr->clear();
+  sv_nTrk->clear();
 
 }
 
@@ -262,6 +295,25 @@ void NeroFatJets::defineBranches(TTree * t){
   track_PV = new vector<vector<int>*>;
   track_fromSV = new vector<vector<int>*>;
   track_SV = new vector<vector<int>*>;
+  sv_mass = new vector<vector<float>*>;
+  sv_pt = new vector<vector<float>*>;
+  sv_eta = new vector<vector<float>*>;
+  sv_phi = new vector<vector<float>*>;
+  sv_energyRatio = new vector<vector<float>*>;
+  sv_charge = new vector<vector<int>*>;
+  sv_dirX = new vector<vector<float>*>;
+  sv_dirY = new vector<vector<float>*>;
+  sv_dirZ = new vector<vector<float>*>;
+  sv_deltaRJet = new vector<vector<float>*>;
+  sv_deltaRSumJet = new vector<vector<float>*>;
+  sv_deltaRSumDir = new vector<vector<float>*>;
+  sv_vtxDistJetAxis = new vector<vector<float>*>;
+  sv_flight = new vector<vector<float>*>;
+  sv_flightErr = new vector<vector<float>*>;
+  sv_flight2D = new vector<vector<float>*>;
+  sv_flight2DErr = new vector<vector<float>*>;
+  sv_nTrk = new vector<vector<float>*>;
+
 
   t->Branch((prefix+string("_tau1IVF")).c_str(),"vector<float>",&tau1IVF);
   t->Branch((prefix+string("_tau2IVF")).c_str(),"vector<float>",&tau2IVF);
@@ -321,6 +373,25 @@ void NeroFatJets::defineBranches(TTree * t){
   t->Branch((prefix+string("_track_PV")).c_str(),"vector<vector<int>*>",&track_PV);
   t->Branch((prefix+string("_track_fromSV")).c_str(),"vector<vector<int>*>",&track_fromSV);
   t->Branch((prefix+string("_track_SV")).c_str(),"vector<vector<int>*>",&track_SV);
+  t->Branch((prefix+string("_sv_mass")).c_str(),"vector<vector<float>*>",&sv_mass);
+  t->Branch((prefix+string("_sv_pt")).c_str(),"vector<vector<float>*>",&sv_pt);
+  t->Branch((prefix+string("_sv_eta")).c_str(),"vector<vector<float>*>",&sv_eta);
+  t->Branch((prefix+string("_sv_phi")).c_str(),"vector<vector<float>*>",&sv_phi);
+  t->Branch((prefix+string("_sv_energyRatio")).c_str(),"vector<vector<float>*>",&sv_energyRatio);
+  t->Branch((prefix+string("_sv_charge")).c_str(),"vector<vector<int>*>",&sv_charge);
+  t->Branch((prefix+string("_sv_dirX")).c_str(),"vector<vector<float>*>",&sv_dirX);
+  t->Branch((prefix+string("_sv_dirY")).c_str(),"vector<vector<float>*>",&sv_dirY);
+  t->Branch((prefix+string("_sv_dirZ")).c_str(),"vector<vector<float>*>",&sv_dirZ);
+  t->Branch((prefix+string("_sv_deltaRJet")).c_str(),"vector<vector<float>*>",&sv_deltaRJet);
+  t->Branch((prefix+string("_sv_deltaRSumJet")).c_str(),"vector<vector<float>*>",&sv_deltaRSumJet);
+  t->Branch((prefix+string("_sv_deltaRSumDir")).c_str(),"vector<vector<float>*>",&sv_deltaRSumDir);
+  t->Branch((prefix+string("_sv_vtxDistJetAxis")).c_str(),"vector<vector<float>*>",&sv_vtxDistJetAxis);
+  t->Branch((prefix+string("_sv_flight")).c_str(),"vector<vector<float>*>",&sv_flight);
+  t->Branch((prefix+string("_sv_flightErr")).c_str(),"vector<vector<float>*>",&sv_flightErr);
+  t->Branch((prefix+string("_sv_flight2D")).c_str(),"vector<vector<float>*>",&sv_flight2D);
+  t->Branch((prefix+string("_sv_flight2DErr")).c_str(),"vector<vector<float>*>",&sv_flight2DErr);
+  t->Branch((prefix+string("_sv_nTrk")).c_str(),"vector<vector<float>*>",&sv_nTrk);
+
 
 }
 
@@ -385,6 +456,25 @@ void NeroFatJets::setBranchAddresses(TTree *t){
   track_PV = new vector<vector<int>*>;
   track_fromSV = new vector<vector<int>*>;
   track_SV = new vector<vector<int>*>;
+  sv_mass = new vector<vector<float>*>;
+  sv_pt = new vector<vector<float>*>;
+  sv_eta = new vector<vector<float>*>;
+  sv_phi = new vector<vector<float>*>;
+  sv_energyRatio = new vector<vector<float>*>;
+  sv_charge = new vector<vector<int>*>;
+  sv_dirX = new vector<vector<float>*>;
+  sv_dirY = new vector<vector<float>*>;
+  sv_dirZ = new vector<vector<float>*>;
+  sv_deltaRJet = new vector<vector<float>*>;
+  sv_deltaRSumJet = new vector<vector<float>*>;
+  sv_deltaRSumDir = new vector<vector<float>*>;
+  sv_vtxDistJetAxis = new vector<vector<float>*>;
+  sv_flight = new vector<vector<float>*>;
+  sv_flightErr = new vector<vector<float>*>;
+  sv_flight2D = new vector<vector<float>*>;
+  sv_flight2DErr = new vector<vector<float>*>;
+  sv_nTrk = new vector<vector<float>*>;
+
 
   t->SetBranchAddress((prefix+string("_tau1IVF")).c_str(),&tau1IVF);
   t->SetBranchAddress((prefix+string("_tau2IVF")).c_str(),&tau2IVF);
@@ -444,6 +534,24 @@ void NeroFatJets::setBranchAddresses(TTree *t){
   t->SetBranchAddress((prefix+string("_track_PV")).c_str(),&track_PV);
   t->SetBranchAddress((prefix+string("_track_fromSV")).c_str(),&track_fromSV);
   t->SetBranchAddress((prefix+string("_track_SV")).c_str(),&track_SV);
+  t->SetBranchAddress((prefix+string("_sv_mass")).c_str(),&sv_mass);
+  t->SetBranchAddress((prefix+string("_sv_pt")).c_str(),&sv_pt);
+  t->SetBranchAddress((prefix+string("_sv_eta")).c_str(),&sv_eta);
+  t->SetBranchAddress((prefix+string("_sv_phi")).c_str(),&sv_phi);
+  t->SetBranchAddress((prefix+string("_sv_energyRatio")).c_str(),&sv_energyRatio);
+  t->SetBranchAddress((prefix+string("_sv_charge")).c_str(),&sv_charge);
+  t->SetBranchAddress((prefix+string("_sv_dirX")).c_str(),&sv_dirX);
+  t->SetBranchAddress((prefix+string("_sv_dirY")).c_str(),&sv_dirY);
+  t->SetBranchAddress((prefix+string("_sv_dirZ")).c_str(),&sv_dirZ);
+  t->SetBranchAddress((prefix+string("_sv_deltaRJet")).c_str(),&sv_deltaRJet);
+  t->SetBranchAddress((prefix+string("_sv_deltaRSumJet")).c_str(),&sv_deltaRSumJet);
+  t->SetBranchAddress((prefix+string("_sv_deltaRSumDir")).c_str(),&sv_deltaRSumDir);
+  t->SetBranchAddress((prefix+string("_sv_vtxDistJetAxis")).c_str(),&sv_vtxDistJetAxis);
+  t->SetBranchAddress((prefix+string("_sv_flight")).c_str(),&sv_flight);
+  t->SetBranchAddress((prefix+string("_sv_flightErr")).c_str(),&sv_flightErr);
+  t->SetBranchAddress((prefix+string("_sv_flight2D")).c_str(),&sv_flight2D);
+  t->SetBranchAddress((prefix+string("_sv_flight2DErr")).c_str(),&sv_flight2DErr);
+  t->SetBranchAddress((prefix+string("_sv_nTrk")).c_str(),&sv_nTrk);
 
 }
 

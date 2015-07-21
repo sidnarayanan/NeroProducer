@@ -154,84 +154,17 @@ void NeroFatJets::runBTagging(const pat::Jet* jet) {
   std::map<double, unsigned int> VTXmass;
   unsigned int nSV_tmp = svTagInfo->nVertices();
   nSV->push_back(nSV_tmp);
-  unsigned int nMaxVertices = 128; // probably not more than this
-  float svtxMass[nMaxVertices];
-  float svtxEnergyRatio[nMaxVertices];
   float maxSVDeltaRToJet = R0-0.1+(R0-0.8)*0.1/0.7;
   edm::RefToBase<reco::Jet> rJet = ipTagInfo->jet();
   math::XYZVector jetDir = rJet->momentum().Unit();
   for (unsigned int vtx = 0; vtx < nSV_tmp; ++vtx) {
-
     const Vertex &vertex = svTagInfo->secondaryVertex(vtx);
-    svtxMass[vtx] = vertex.p4().mass();
-
-    Int_t totcharge=0;
-    reco::TrackKinematics vertexKinematics;
-    // get the vertex kinematics and charge
-    vertexKinematicsAndCharge(vertex, vertexKinematics, totcharge);
-
-    math::XYZTLorentzVector vertexSum = vertexKinematics.weightedVectorSum();
+    double svtxMass = vertex.p4().mass();
     GlobalVector flightDir = svTagInfo->flightDirection(vtx);
-
-    // JetInfo[iJetColl].SV_deltaR_jet[JetInfo[iJetColl].nSV]     = ( reco::deltaR(flightDir, jetDir) );
-    // JetInfo[iJetColl].SV_deltaR_sum_jet[JetInfo[iJetColl].nSV] = ( reco::deltaR(vertexSum, jetDir) );
-    // JetInfo[iJetColl].SV_deltaR_sum_dir[JetInfo[iJetColl].nSV] = ( reco::deltaR(vertexSum, flightDir) );
-
-    // Line::PositionType pos(GlobalPoint(position(vertex).x(),position(vertex).y(),position(vertex).z()));
-    // Line trackline(pos,flightDir);
-    // // get the Jet  line
-    // Line::PositionType pos2(GlobalPoint(pv->x(),pv->y(),pv->z()));
-    // Line::DirectionType dir2(GlobalVector(jetDir.x(),jetDir.y(),jetDir.z()));
-    // Line jetline(pos2,dir2);
-    // // now compute the distance between the two lines
-    // JetInfo[iJetColl].SV_vtxDistJetAxis[JetInfo[iJetColl].nSV] = (jetline.distance(trackline)).mag();
-
-    svtxEnergyRatio[vtx] = vertexSum.E() / allSum.E();
     if (reco::deltaR2(flightDir, jetDir)<(maxSVDeltaRToJet*maxSVDeltaRToJet))
-      VTXmass[svtxMass[vtx]]=vtx;
+      VTXmass[svtxMass]=vtx;
   } //// if secondary vertices present
-  int cont=0;
-  GlobalVector flightDir0, flightDir1;
-  reco::Candidate::LorentzVector svP4_0 , svP4_1;
-  vector<float>* svEnergyRatio_tmp = new vector<float>;
-  vector<float>* svMass_tmp = new vector<float>;
-  vector<float>* svPt_tmp = new vector<float>;
-  for ( std::map<double, unsigned int>::reverse_iterator iVtx=VTXmass.rbegin(); iVtx!=VTXmass.rend(); ++iVtx)
-  {
-    ++cont;
-    const Vertex &vertex = svTagInfo->secondaryVertex(iVtx->second);
-    float SV_EnergyRatio = svtxEnergyRatio[iVtx->second];
-    svEnergyRatio_tmp->push_back(SV_EnergyRatio);
-    svMass_tmp->push_back(vertex.p4().mass());
-    svPt_tmp->push_back(vertex.p4().pt());
-    if (cont==1)
-    {
-      flightDir0 = svTagInfo->flightDirection(iVtx->second);
-      svP4_0= vertex.p4();
-      float tauDot_tmp;
-      if (reco::deltaR2(flightDir0,currentAxes[1])<reco::deltaR2(flightDir0,currentAxes[0]))
-        tauDot_tmp = (currentAxes[1].px()*flightDir0.x()+currentAxes[1].py()*flightDir0.y()+currentAxes[1].pz()*flightDir0.z())/(sqrt(currentAxes[1].modp2())*flightDir0.mag());
-      else
-        tauDot_tmp = (currentAxes[0].px()*flightDir0.x()+currentAxes[0].py()*flightDir0.y()+currentAxes[0].pz()*flightDir0.z())/(sqrt(currentAxes[0].modp2())*flightDir0.mag());
-      tauDot->push_back(tauDot_tmp);
-    }
-    if (cont==2)
-    {
-      flightDir1 = svTagInfo->flightDirection(iVtx->second);
-      svP4_1 = vertex.p4();
-      zRatio->push_back(reco::deltaR(flightDir0,flightDir1)*(svP4_0.pt())/(svP4_0+svP4_1).mass());
-    }
-  }
-  if (cont<2) {
-    zRatio->push_back(-1.);
-  }
-  if (cont<1) {
-    tauDot->push_back(-1);
-  }
-  svEnergyRatio->push_back(svEnergyRatio_tmp);
-  svMass->push_back(svMass_tmp);
-  svPt->push_back(svPt_tmp);
-  reco::TaggingVariableList svVars = svTagInfo->taggingVariables();
+  computeSVVars(VTXmass, svTagInfo, allSum.E());
 }
 
 template<typename T>
@@ -245,7 +178,6 @@ void NeroFatJets::fillTaggingVar(reco::TaggingVariableList const & varList, std:
 void NeroFatJets::computeTrkVars(const IPTagInfo * ipTagInfo, const SVTagInfo * svTagInfo, reco::TrackKinematics & allKinematics) {
   const reco::TaggingVariableList ipVars = ipTagInfo->taggingVariables();
   nTracks->push_back(ipTagInfo->selectedTracks().size());
-
   fillTaggingVar(ipVars,track_momentum,reco::btau::trackMomentum);
   fillTaggingVar(ipVars,track_eta,reco::btau::trackEta);
   fillTaggingVar(ipVars,track_phi,reco::btau::trackPhi);
@@ -321,9 +253,9 @@ void NeroFatJets::computeTrkVars(const IPTagInfo * ipTagInfo, const SVTagInfo * 
     tmp_PVWeight.push_back(PVWeight);
     if (!PV && PVWeight > 0)
       allKinematics.add(ptrack,PVWeight);
-    try {
+    if (svTagInfo) {
       setTracksSV(ptrackRef,svTagInfo,fromSV, SV, SVWeight);
-    } catch(std::exception& e) {
+    } else {
       fromSV = 0;
       SV = -1;
       SVWeight = 0;
@@ -356,7 +288,111 @@ void NeroFatJets::computeTrkVars(const IPTagInfo * ipTagInfo, const SVTagInfo * 
   track_SV->push_back(&tmp_SV);
 }
 
-void NeroFatJets::computeSVVars(const IPTagInfo * ipTagInfo, const SVTagInfo * SVTagInfo) {
+void NeroFatJets::computeSVVars(const std::map<double, unsigned int> VTXmass, const SVTagInfo * svTagInfo, float allEnergy) {
+  std::vector<float> tmp_mass;
+  std::vector<float> tmp_pt;
+  std::vector<float> tmp_eta;
+  std::vector<float> tmp_phi;
+  std::vector<float> tmp_energyRatio;
+  std::vector<int> tmp_charge;
+  std::vector<float> tmp_dirX;
+  std::vector<float> tmp_dirY;
+  std::vector<float> tmp_dirZ;
+  std::vector<float> tmp_deltaRJet;
+  std::vector<float> tmp_deltaRSumJet;
+  std::vector<float> tmp_deltaRSumDir;
+  std::vector<float> tmp_vtxDistJetAxis;
+  std::vector<float> tmp_flight;
+  std::vector<float> tmp_flightErr;
+  std::vector<float> tmp_flight2D;
+  std::vector<float> tmp_flight2DErr;
+  std::vector<float> tmp_nTrk;
+  GlobalVector flightDir0, flightDir1;
+  reco::Candidate::LorentzVector svP4_0 , svP4_1;
+  const reco::Vertex *pv = &(*primaryVertices->begin());
+  int cont=0;
+  // fill FatJet::fSVData in order of decreasing secondary vertex mass
+  for ( std::map<double, unsigned int>::reverse_iterator iVtx=VTXmass.rbegin(); iVtx!=VTXmass.rend(); ++iVtx) {
+    ++cont;
+    unsigned int idx = iVtx->second;
+    const Vertex &vertex = svTagInfo->secondaryVertex(idx);
+    int totcharge=0;
+    reco::TrackKinematics vertexKinematics;
+    vertexKinematicsAndCharge(vertex, vertexKinematics, totcharge);
+    math::XYZTLorentzVector vertexSum = vertexKinematics.weightedVectorSum();
+    tmp_energyRatio.push_back(vertexSum.E() / allEnergy);
+    tmp_charge.push_back(totcharge);
+
+    //svx kinematics
+    tmp_mass.push_back(iVtx->first);
+    tmp_pt.push_back(vertex.p4().pt());
+    tmp_eta.push_back(vertex.p4().eta());
+    tmp_phi.push_back(vertex.p4().phi());
+
+    GlobalVector flightDir = svTagInfo->flightDirection(idx);
+    tmp_dirX.push_back(flightDir.x());
+    tmp_dirY.push_back(flightDir.y());
+    tmp_dirZ.push_back(flightDir.z());
+    tmp_deltaRJet.push_back(reco::deltaR(flightDir, jetDir));
+    tmp_deltaRSumJet.push_back(reco::deltaR(vertexSum, jetDir));
+    tmp_deltaRSumDir.push_back(reco::deltaR(vertexSum, flightDir));
+
+    Line::PositionType pos(GlobalPoint(vertex.position().x(),vertex.position().y(),vertex.position().z()));
+    Line trackline(pos,flightDir);
+    Line::PositionType pos2(GlobalPoint(pv->x(),pv->y(),pv->z()));
+    Line::DirectionType dir2(GlobalVector(jetDir.x(),jetDir.y(),jetDir.z()));
+    Line jetline(pos2,dir2);
+    tmp_vtxDistJetAxis.push_back((jetline.distance(trackline)).mag());
+
+    tmp_flight.push_back(svTagInfo->flightDistance(idx).value());
+    tmp_flightErr.push_back(svTagInfo->flightDistance(idx).error());
+    tmp_flight2D.push_back(svTagInfo->flightDistance(idx, true).value());
+    tmp_flight2DErr.push_back(svTagInfo->flightDistance(idx, true).error());
+    tmp_nTrk.push_back(svTagInfo->secondaryVertex(idx).numberOfSourceCandidatePtrs());
+
+    if (cont==1)
+    {
+      flightDir0 = svTagInfo->flightDirection(iVtx->second);
+      svP4_0= vertex.p4();
+      float tauDot_tmp;
+      if (reco::deltaR2(flightDir0,currentAxes[1])<reco::deltaR2(flightDir0,currentAxes[0]))
+        tauDot_tmp = (currentAxes[1].px()*flightDir0.x()+currentAxes[1].py()*flightDir0.y()+currentAxes[1].pz()*flightDir0.z())/(sqrt(currentAxes[1].modp2())*flightDir0.mag());
+      else
+        tauDot_tmp = (currentAxes[0].px()*flightDir0.x()+currentAxes[0].py()*flightDir0.y()+currentAxes[0].pz()*flightDir0.z())/(sqrt(currentAxes[0].modp2())*flightDir0.mag());
+      tauDot->push_back(tauDot_tmp);
+    }
+    if (cont==2)
+    {
+      flightDir1 = svTagInfo->flightDirection(iVtx->second);
+      svP4_1 = vertex.p4();
+      zRatio->push_back(reco::deltaR(flightDir0,flightDir1)*(svP4_0.pt())/(svP4_0+svP4_1).mass());
+    }
+  }
+  sv_mass->push_back(&tmp_mass);
+  sv_pt->push_back(&tmp_pt);
+  sv_eta->push_back(&tmp_eta);
+  sv_phi->push_back(&tmp_phi);
+  sv_energyRatio->push_back(&tmp_energyRatio);
+  sv_charge->push_back(&tmp_charge);
+  sv_dirX->push_back(&tmp_dirX);
+  sv_dirY->push_back(&tmp_dirY);
+  sv_dirZ->push_back(&tmp_dirZ);
+  sv_deltaRJet->push_back(&tmp_deltaRJet);
+  sv_deltaRSumJet->push_back(&tmp_deltaRSumJet);
+  sv_deltaRSumDir->push_back(&tmp_deltaRSumDir);
+  sv_vtxDistJetAxis->push_back(&tmp_vtxDistJetAxis);
+  sv_flight->push_back(&tmp_flight);
+  sv_flightErr->push_back(&tmp_flightErr);
+  sv_flight2D->push_back(&tmp_flight2D);
+  sv_flight2DErr->push_back(&tmp_flight2DErr);
+  sv_nTrk->push_back(&tmp_nTrk);
+
+  if (cont<2) zRatio->push_back(-1.);
+  if (cont<1) tauDot->push_back(-1);
+
+  reco::TaggingVariableList svVars = svTagInfo->taggingVariables();
+  
+
 }
 
 void NeroFatJets::setTracksSV (const TrackRef & trackRef, const SVTagInfo * svTagInfo, int & isFromSV, int & iSV, float & SVweight)
