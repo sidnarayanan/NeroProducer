@@ -17,10 +17,12 @@ jecVersion = switchBX('25nsV6', '50nsV5')
 if analysis.isRealData:
     jecPattern = mitdata + '/JEC/Summer15_' + jecVersion + '/Summer15_' + jecVersion + '_DATA_{level}_{jettype}.txt'
     jecLevels = ['L1FastJet', 'L2Relative', 'L3Absolute', 'L2L3Residual']
+    jecLevelsForGrooming = ['L2Relative', 'L3Absolute', 'L2L3Residual']
 
 else:
     jecPattern = mitdata +'/JEC/Summer15_' + jecVersion + '/Summer15_' + jecVersion + '_MC_{level}_{jettype}.txt'
     jecLevels = ['L1FastJet', 'L2Relative', 'L3Absolute']
+    jecLevelsForGrooming = ['L2Relative', 'L3Absolute']
 
 #########################################
 ### MODULES RUN WITH DEFAULT SETTINGS ###
@@ -402,8 +404,12 @@ ak8JetExtender = mithep.FatJetExtenderMod('AK8JetExtender',
     DoShowerDeconstruction = False,
     DoECF = False,
     DoQjets = False,
-    BeVerbose = False
+    BeVerbose = False,
+    JetAlgo = mithep.FatJetExtenderMod.kAntiKt,
+    CorrectionLevel = mithep.FatJetExtenderMod.mL2L3
 )
+for level in jecLevelsForGrooming:
+    ak8JetExtender.AddCorrectionFromFile(jecPattern.format(level=level,jettype='AK8PFchs'))
 ak8JetExtender.SetSubJetTypeOn(mithep.XlSubJet.kSoftDrop)
 
 ca15JetCorrection = mithep.JetCorrectionMod('CA15JetCorrection',
@@ -434,8 +440,12 @@ ca15JetExtender = mithep.FatJetExtenderMod('CA15JetExtender',
     DoShowerDeconstruction = False,
     DoECF = False,
     DoQjets = False,
-    BeVerbose = False
+    BeVerbose = False,
+    JetAlgo = mithep.FatJetExtenderMod.kCambridgeAachen,
+    CorrectionLevel = mithep.FatJetExtenderMod.mL2L3
 )
+for level in jecLevelsForGrooming:
+    ca15JetExtender.AddCorrectionFromFile(jecPattern.format(level=level,jettype='AK8PFchs'))
 ca15JetExtender.SetSubJetTypeOn(mithep.XlSubJet.kSoftDrop)
 
 ### PUPPI ###
@@ -488,8 +498,12 @@ ak8PuppiJetExtender = mithep.FatJetExtenderMod('puppiAK8Extender',
     DoECF = False,
     DoQjets = False,
     UseSoftDropLib = False,
-    DoCMSandHTT = False
+    DoCMSandHTT = False,
+    JetAlgo = mithep.FatJetExtenderMod.kAntiKt,
+    CorrectionLevel = mithep.FatJetExtenderMod.mL2L3
 )
+for level in jecLevelsForGrooming:
+    ak8PuppiJetExtender.AddCorrectionFromFile(jecPattern.format(level=level,jettype='AK8PFPuppi'))
 ak8PuppiJetExtender.SetSubJetTypeOn(mithep.XlSubJet.kSoftDrop)
 
 puppiCA15CorrectionMod = mithep.JetCorrectionMod('puppiCA15Correction',
@@ -523,8 +537,11 @@ ca15PuppiJetExtender = mithep.FatJetExtenderMod('puppiCA15Extender',
     DoECF = False,
     DoQjets = False,
     UseSoftDropLib = False,
-    DoCMSandHTT = False
+    JetAlgo = mithep.FatJetExtenderMod.kCambridgeAachen,
+    CorrectionLevel = mithep.FatJetExtenderMod.mL2L3
 )
+for level in jecLevelsForGrooming:
+    ca15PuppiJetExtender.AddCorrectionFromFile(jecPattern.format(level=level,jettype='AK8PFPuppi'))
 ca15PuppiJetExtender.SetSubJetTypeOn(mithep.XlSubJet.kSoftDrop)
 
 ####################
