@@ -132,6 +132,12 @@ if __name__ == '__main__':
     #submit(config)
 
     config.Data.unitsPerJob = 5
+    config.General.requestName = 'ttdm-synch'
+    config.Data.inputDataset = '/TTbarDMJets_pseudoscalar_Mchi-1_Mphi-100_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIIFall15MiniAODv2-PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/MINIAODSIM'
+    submit(config)
+
+    '''
+    config.Data.unitsPerJob = 5
     config.General.requestName = 'DY-amcatnlo'
     config.Data.inputDataset= '/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/RunIIFall15MiniAODv2-PU25nsData2015v1_HCALDebug_76X_mcRun2_asymptotic_v12-v1/MINIAODSIM'
     submit(config)
@@ -146,7 +152,7 @@ if __name__ == '__main__':
 
     config.General.requestName = "ChargedHiggs_HplusTB_HplusToTauB_M-300_13TeV_amcatnlo_pythia8"
     config.Data.inputDataset="/ChargedHiggs_HplusTB_HplusToTauB_M-300_13TeV_amcatnlo_pythia8/RunIIFall15MiniAODv2-PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/MINIAODSIM"
-
+    '''
     #config.General.requestName = 'WJets-25ns'
     #config.Data.inputDataset= '/WJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1/MINIAODSIM'
     #submit(config)
@@ -309,7 +315,7 @@ if __name__ == '__main__':
     ###################################################
     config.Data.unitsPerJob = 150
 
-
+    '''
     config.General.requestName = 'SingleMuon-Run2015D'
     config.Data.inputDataset = '/SingleMuon/Run2015D-16Dec2015-v1/MINIAOD'
     submit(config)
@@ -325,7 +331,7 @@ if __name__ == '__main__':
     config.General.requestName = 'MET-Run2015D'
     config.Data.inputDataset = '/MET/Run2015D-16Dec2015-v1/MINIAOD'
     submit(config)
-
+    '''
 # Local Variables:
 # mode:python
 # indent-tabs-mode:nil
