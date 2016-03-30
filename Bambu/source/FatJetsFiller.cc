@@ -2,6 +2,8 @@
 
 #include "MitAna/DataTree/interface/FatJetCol.h"
 #include "MitAna/DataTree/interface/FatJet.h"
+#include "MitAna/DataTree/interface/JetCol.h"
+#include "MitAna/DataTree/interface/Jet.h"
 #include <algorithm>
 
 ClassImp(mithep::nero::FatJetsFiller)
@@ -43,7 +45,7 @@ mithep::nero::FatJetsFiller::finalize()
 void
 mithep::nero::FatJetsFiller::fill()
 {
-  auto* jets = getSource<mithep::FatJetCol>(fatJetsName_);
+  auto* jets = getSource<mithep::JetCol>(fatJetsName_);
   unsigned int subjetCounter=0;
   for (unsigned iJ(0); iJ != jets->GetEntries(); ++iJ) {
     if (jets->At(iJ)->ObjType() != kFatJet)
