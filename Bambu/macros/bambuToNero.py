@@ -14,6 +14,7 @@ except KeyError:
     bx = '25ns'
 
 def switchBX(case25, case50):
+    global bx
     return case25 if bx == '25ns' else case50
 
 jecVersion = switchBX('25nsV6', '50nsV5')
