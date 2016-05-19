@@ -82,7 +82,7 @@ void BareMonteCarlo::defineBranches(TTree *t){
     t->Branch("pdfRwgt", "vector<float>", &pdfRwgt);
     t->Branch("genIso","vector<float>", &genIso);
     t->Branch("genIsoFrixione","vector<float>", &genIsoFrixione);
-    t->Branch("parent","vector<int>", &parent);
+    t->Branch("genParent","vector<int>", &parent);
 }
 
 void BareMonteCarlo::setBranchAddresses(TTree *t){
@@ -112,7 +112,7 @@ void BareMonteCarlo::setBranchAddresses(TTree *t){
     BareFunctions::SetBranchAddress(t,"genIso", &genIso);
     BareFunctions::SetBranchAddress(t,"genIsoFrixione", &genIsoFrixione);
 
-    BareFunctions::SetBranchAddress(t,"parent", &parent);
+    BareFunctions::SetBranchAddress(t,"genParent", &parent);
 }
 
 void BareMonteCarlo::compress(){

@@ -4,6 +4,7 @@
 #include "MitAna/DataTree/interface/FatJet.h"
 #include "MitAna/DataTree/interface/JetCol.h"
 #include "MitAna/DataTree/interface/Jet.h"
+#include "MitAna/DataTree/interface/XlSubJet.h"
 #include <algorithm>
 
 ClassImp(mithep::nero::FatJetsFiller)
@@ -74,14 +75,16 @@ mithep::nero::FatJetsFiller::fill()
     out_.softdropMass->push_back(jet.MassSoftDrop());
     
     std::vector<float> subjetBtags = jet.GetSubJetBtags();
+
     unsigned int nSubjets = subjetBtags.size();
     out_.nSubjets->push_back(nSubjets);
     out_.firstSubjet->push_back(subjetCounter);
-    subjetCounter += nSubjets;
 
     for (unsigned int iB=0; iB!=nSubjets; ++iB) {
       out_.subjet_btag->push_back(subjetBtags[iB]);
     }
+    
+    subjetCounter += nSubjets;
     
   }
 }

@@ -153,7 +153,7 @@ mithep::nero::MonteCarloFiller::fill()
     }
   }
   
-  for (unsigned iP=0; iP != savedParticles->size(); ++iP) {
+  for (unsigned iP=0; iP != savedParticles.size(); ++iP) {
     const MCParticle *part = savedParticles[iP];
     if (!part->HasMother()) {
       out_.parent->push_back(-1);
@@ -162,11 +162,12 @@ mithep::nero::MonteCarloFiller::fill()
     int motherIdx=-1;
     const MCParticle *mother=part;
     while (mother->HasMother()) {
-      mother = mother->FindMother();
-      if (neroIndices.find(mother)==neroIndices.end()) {
+      mother = mother->Mother();
+      auto mother_ = neroIndices.find(mother);
+      if (mother_==neroIndices.end()) {
         continue;
       }
-      motherIdx = neroIndices[mother];
+      motherIdx = mother_->second;
       break;
     }
     out_.parent->push_back(motherIdx);
