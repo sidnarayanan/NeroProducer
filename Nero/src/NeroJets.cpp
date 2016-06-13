@@ -181,7 +181,7 @@ int NeroJets::analyze(const edm::Event& iEvent, const edm::EventSetup &iSetup){
         // Fill output object	
         rawPt  -> push_back (j.pt()*j.jecFactor("Uncorrected"));
         //puId   -> push_back (j.userFloat("pileupJetId:fullDiscriminant") );
-        puId   -> push_back (j.userFloat("pileupJetIdUpdated:fullDiscriminant") );
+        //puId   -> push_back (j.userFloat("pileupJetIdUpdated:fullDiscriminant") );
         bDiscr -> push_back( j.bDiscriminator("pfCombinedInclusiveSecondaryVertexV2BJetTags") );
         bDiscrLegacy -> push_back( j.bDiscriminator("combinedSecondaryVertexBJetTags") );
         qgl     -> push_back( qgLikelihood );

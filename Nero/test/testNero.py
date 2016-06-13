@@ -164,6 +164,7 @@ process.es_prefer_jer = cms.ESPrefer('PoolDBESSource', 'jer')
 
 ################ end sqlite connection
 
+'''
 process.load("RecoJets.JetProducers.PileupJetID_cfi")
 process.pileupJetIdUpdated = process.pileupJetId.clone(
   jets=cms.InputTag("slimmedJets"),
@@ -171,6 +172,7 @@ process.pileupJetIdUpdated = process.pileupJetId.clone(
   applyJec=True,
   vertexes=cms.InputTag("offlineSlimmedPrimaryVertices")
   )
+'''
 
 
 #### RECOMPUTE JEC From GT ###
@@ -189,10 +191,13 @@ updateJetCollection(
 print "-> Updating the jets collection to run on to 'updatedPatJetsUpdatedJEC' with the new jec in the GT"
 process.nero.jets=cms.InputTag('updatedPatJetsUpdatedJEC')
 
+'''
 print "-> Updating the jet user float for the pu id"
 process.updatedPatJetsUpdatedJEC.userData.userFloats.src += ['pileupJetIdUpdated:fullDiscriminant']
+'''
 
-process.jecSequence = cms.Sequence( process.pileupJetIdUpdated*process.patJetCorrFactorsUpdatedJEC* process.updatedPatJetsUpdatedJEC )
+#process.jecSequence = cms.Sequence( process.pileupJetIdUpdated*process.patJetCorrFactorsUpdatedJEC* process.updatedPatJetsUpdatedJEC )
+process.jecSequence = cms.Sequence( process.patJetCorrFactorsUpdatedJEC* process.updatedPatJetsUpdatedJEC )
 
 ############ RECOMPUTE MET #######################
 from PhysicsTools.PatUtils.tools.runMETCorrectionsAndUncertainties import runMetCorAndUncFromMiniAOD
@@ -211,43 +216,26 @@ process.jetSequence = cms.Sequence()
 if process.nero.doReclustering:
     if process.nero.doPuppi:
         # run puppi algo
-        process.load('NeroProducer.Nero.Puppi_cff')
+        #process.load('NeroProducer.Nero.Puppi_cff')
+        process.load('CommonTools.PileupAlgos.Puppi_cff')
 
         process.puppi.candName   = cms.InputTag('packedPFCandidates')
         process.puppi.vertexName = cms.InputTag('offlineSlimmedPrimaryVertices')
 
-        process.pfCandNoLep = cms.EDFilter("CandPtrSelector", 
-                                            src = cms.InputTag("packedPFCandidates"), 
-                                            cut =  cms.string("abs(pdgId) != 13 && abs(pdgId) != 11 && abs(pdgId) != 15"))
-        process.pfCandLep   = cms.EDFilter("CandPtrSelector", 
-                                            src = cms.InputTag("packedPFCandidates"), 
-                                            cut = cms.string("abs(pdgId) == 13 || abs(pdgId) == 11 || abs(pdgId) == 15"))
-
         process.puppiNoLep = process.puppi.clone()
-        process.puppiNoLep.candName = cms.InputTag('pfCandNoLep') 
+        process.puppi.useExistingWeights = False
+        process.puppiNoLep.useExistingWeights = False
+        process.puppiNoLep.useWeightsNoLep = True
 
-        process.puppiMerged = cms.EDProducer("CandViewMerger",src = cms.VInputTag( 'puppiNoLep','pfCandLep'))
+        process.load('CommonTools/PileupAlgos/PhotonPuppi_cff')
+        process.puppiPhoton.weightsName = 'puppiNoLep'
+        process.puppiForMET = cms.EDProducer("CandViewMerger",src = cms.VInputTag( 'puppiPhoton'))
 
-        process.puppiForMET = cms.EDProducer("PuppiPhoton",
-                                             candName       = cms.InputTag('packedPFCandidates'),
-                                             puppiCandName  = cms.InputTag('puppiMerged'),
-                                             photonName     = cms.InputTag('slimmedPhotons'),
-                                             photonId       = cms.InputTag("egmPhotonIDs:cutBasedPhotonID_PHYS14_PU20bx25_V2p1-standalone-loose"),
-                                             pt             = cms.double(10),
-                                             useRefs        = cms.bool(True),
-                                             dRMatch        = cms.vdouble(10,10,10,10),
-                                             pdgids         = cms.vint32 (22,11,211,130),
-                                             weight         = cms.double(1.),
-                                             useValueMap    = cms.bool(False),
-                                             weightsName    = cms.InputTag('puppi'),
-                                             )
-        process.puppiForMET.puppiCandName    = 'puppiMerged'
         process.puppiSequence += process.puppi
-        process.puppiSequence += process.pfCandNoLep
-        process.puppiSequence += process.pfCandLep
         process.puppiSequence += process.puppiNoLep
-        process.puppiSequence += process.puppiMerged
+        process.puppiSequence += process.puppiPhoton
         process.puppiSequence += process.puppiForMET
+
 
         # recompute ak4 jets for corrections
         from RecoJets.JetProducers.ak4PFJets_cfi import ak4PFJets
