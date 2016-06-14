@@ -113,7 +113,7 @@ def makeFatJets(process,isData,pfCandidates,algoLabel,jetRadius):
     sdZcut = 0.1
     sdBeta = 0.0
   else:
-    sdZcut = 0.2
+    sdZcut = 0.15
     sdBeta = 1.0
 
   setattr(process,neroLabel+'Sequence',cms.Sequence())
@@ -187,6 +187,7 @@ def makeFatJets(process,isData,pfCandidates,algoLabel,jetRadius):
                                                       zcut = cms.double(sdZcut),
                                                       beta = cms.double(sdBeta),
                                                       writeCompound = cms.bool(True),
+                                                      useExplicitGhosts = cms.bool(True),
                                                       jetCollInstanceName=cms.string("SubJets")
                                                   )
     )

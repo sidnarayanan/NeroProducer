@@ -110,8 +110,8 @@ int NeroPuppiFatJets::analyze(const edm::Event& iEvent)
           tau2 -> push_back(j.userFloat(tPrefix+"Njettiness:tau2"));
           tau3 -> push_back(j.userFloat(tPrefix+"Njettiness:tau3"));
   
-          softdropMass->push_back(j.userFloat(tPrefix+"SDKinematics:Mass")*jecFactor);
-    
+          softdropMass->push_back(j.userFloat(tPrefix+"SDKinematics:Mass"));
+
           unsigned int nsubjetThisJet=0;
           firstSubjet->push_back(nsubjet);
 
