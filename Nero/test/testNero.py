@@ -345,11 +345,11 @@ if process.nero.doReclustering:
         fatjetInitSequence = initFatJets(process,isData)
         process.jetSequence += fatjetInitSequence
     if process.nero.doAK8 and process.nero.doPuppi:
-        ak8PuppiSequence = makeFatJets(process,isData=isData,pfCandidates='puppiForMET',algoLabel='AK',jetRadius=0.8)
+        ak8PuppiSequence = makeFatJets(process,isData=isData,pfCandidates='puppi',algoLabel='AK',jetRadius=0.8)
         process.jetSequence += ak8PuppiSequence
     if process.nero.doCA15:
         if process.nero.doPuppi:
-            ca15PuppiSequence = makeFatJets(process,isData=isData,pfCandidates='puppiForMET',algoLabel='CA',jetRadius=1.5)
+            ca15PuppiSequence = makeFatJets(process,isData=isData,pfCandidates='puppi',algoLabel='CA',jetRadius=1.5)
             process.jetSequence += ca15PuppiSequence
         else:
             ca15CHSSequence = makeFatJets(process,isData=isData,pfCandidates='pfCHS',algoLabel='CA',jetRadius=1.5)

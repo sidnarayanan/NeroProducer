@@ -55,7 +55,7 @@ def initFatJets(process,isData):
   if isMC:
     process.packedGenParticlesForJetsNoNu = cms.EDFilter("CandPtrSelector", src = cms.InputTag("packedGenParticles"), cut = cms.string("abs(pdgId) != 12 && abs(pdgId) != 14 && abs(pdgId) != 16"))
     process.ak4GenJetsNoNu = ak4GenJets.clone(src = 'packedGenParticlesForJetsNoNu')
-  process.ak4PFJets = ak4PFJets.clone(src='pfCHS',doAreaFastjet=True)
+  process.ak4PFJets = ak4PFJets.clone(src='pfCHS',doAreaFastjet=False)
 
   postfix='PFlow'
   
@@ -174,8 +174,8 @@ def makeFatJets(process,isData,pfCandidates,algoLabel,jetRadius):
                                                 jetAlgorithm = cms.string(jetAlgo),
                                                 rParam = cms.double(jetRadius),
                                                 src = cms.InputTag(pfCandidates),
-                                                srcPVs = cms.InputTag(pvSource),
-                                                doAreaFastjet = cms.bool(True),
+                                                # srcPVs = cms.InputTag(pvSource),
+                                                doAreaFastjet = cms.bool(False),
                                                 jetPtMin = cms.double(150)
                                             )
   )
@@ -239,7 +239,7 @@ def makeFatJets(process,isData,pfCandidates,algoLabel,jetRadius):
   setattr(process,neroLabel+'PFImpactParameterTagInfos',
       pfImpactParameterTagInfos.clone(
           jets      = cms.InputTag('PFJets'+"SoftDrop"+neroLabel,'SubJets'),
-          maxDeltaR = cms.double(jetRadius),
+          maxDeltaR = cms.double(0.4),
           primaryVertex = cms.InputTag('offlineSlimmedPrimaryVertices'),
           candidates = cms.InputTag('packedPFCandidates')
       )
