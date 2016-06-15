@@ -226,6 +226,9 @@ bool NeroJets::JetId(const pat::Jet &j, std::string id)
     // --- Charged Multiplicity     > 0     > 0
     // --- Charged EM Fraction      < 0.99  < 0.90 
 
+    if (id=="none")
+        return true; // in case someone wants to save all jets
+
     bool jetid = false;
 
     float NHF    = j.neutralHadronEnergyFraction();

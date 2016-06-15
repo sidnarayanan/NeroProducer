@@ -102,6 +102,8 @@ Nero::Nero(const edm::ParameterSet& iConfig)
 
     obj.push_back(jets);
 
+    bool doReclustering= iConfig.getParameter<bool>("doReclustering");
+
     NeroPuppiJets *puppijets = new NeroPuppiJets();
     puppijets -> mOnlyMc = onlyMc;
     puppijets -> token = consumes<pat::JetCollection>(iConfig.getParameter<edm::InputTag>("puppijets"));
@@ -111,9 +113,10 @@ Nero::Nero(const edm::ParameterSet& iConfig)
     puppijets -> mMinId = iConfig.getParameter<string>("minPuppiJetId");
     puppijets -> pf = pf;
     puppijets -> cachedPrefix = "";
+    puppijets -> reclustered = doReclustering;
+    puppijets -> rho_token = evt->rho_token;
     obj.push_back(puppijets);
     
-    bool doReclustering= iConfig.getParameter<bool>("doReclustering");
     bool doAK8 = iConfig.getParameter<bool>("doAK8");
     bool doCA15 = iConfig.getParameter<bool>("doCA15");
     bool doPuppi = iConfig.getParameter<bool>("doPuppi");

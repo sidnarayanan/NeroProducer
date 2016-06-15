@@ -33,7 +33,7 @@ class NeroPuppiFatJets : virtual public NeroCollection,
         float mMaxEta;
         string mMinId;
         float jetRadius; // used for subjet matching
-        FactorizedJetCorrector *mMCJetCorrector;   // needed for puppi jets
+        FactorizedJetCorrector *mMCJetCorrector;   // needed for puppi fat jets
         FactorizedJetCorrector *mDataJetCorrector; 
 
 };

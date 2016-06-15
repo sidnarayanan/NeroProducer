@@ -16,75 +16,24 @@ def initFatJets(process,isData):
   ########################################
   ##         INITIAL SETUP              ##
   ########################################
-  jetCorrectionsAK4 = ('AK4PFchs', ['L1FastJet', 'L2Relative', 'L3Absolute'], 'None')
-  jetCorrectionsAK8 = ('AK8PFchs', ['L1FastJet', 'L2Relative', 'L3Absolute'], 'None')
-  if isData:
-      jetCorrectionsAK4[1].append('L2L3Residual')
-      jetCorrectionsAK8[1].append('L2L3Residual')
-
-  ## Various collection names
-  genParticles = 'prunedGenParticles'
-  jetSource = 'ak4PFJets'
-  genJetCollection = 'ak4GenJetsNoNu'
-  pfCandidates = 'packedPFCandidates'
-  pvSource = 'offlineSlimmedPrimaryVertices'
-  svSource = 'slimmedSecondaryVertices'
-  muSource = 'slimmedMuons'
-  elSource = 'slimmedElectrons'
-
-  PFjetAlgo="AK4"
 
   ## Load standard PAT objects
   process.load("PhysicsTools.PatAlgos.producersLayer1.patCandidates_cff")
   process.load("PhysicsTools.PatAlgos.selectionLayer1.selectedPatCandidates_cff")
 
-  bTagInfos = [
-      'pfImpactParameterTagInfos'
-     ,'pfSecondaryVertexTagInfos'
-     ,'pfInclusiveSecondaryVertexFinderTagInfos'
-     ,'softPFMuonsTagInfos'
-     ,'softPFElectronsTagInfos'
-  ]
-  ## b-tag discriminators
-  bTagDiscriminators = [
-      'pfCombinedSecondaryVertexV2BJetTags'
-      ,'pfCombinedInclusiveSecondaryVertexV2BJetTags'
-  ]
-  
   process.pfCHS = cms.EDFilter("CandPtrSelector", src = cms.InputTag("packedPFCandidates"), cut = cms.string("fromPV"))
-  if isMC:
+  addGenNoNu=False
+  if isMC and not hasattr(process,'packedGenParticlesForJetsNoNu'):
     process.packedGenParticlesForJetsNoNu = cms.EDFilter("CandPtrSelector", src = cms.InputTag("packedGenParticles"), cut = cms.string("abs(pdgId) != 12 && abs(pdgId) != 14 && abs(pdgId) != 16"))
-    process.ak4GenJetsNoNu = ak4GenJets.clone(src = 'packedGenParticlesForJetsNoNu')
-  process.ak4PFJets = ak4PFJets.clone(src='pfCHS',doAreaFastjet=False)
+    addGenNoNu=True
 
-  postfix='PFlow'
-  
-  ## Switch the default jet collection (done in order to use the above specified b-tag infos and discriminators)
-  switchJetCollection(
-      process,
-      jetSource = cms.InputTag(jetSource),
-      pfCandidates = cms.InputTag(pfCandidates),
-      pvSource = cms.InputTag(pvSource),
-      svSource = cms.InputTag(svSource),
-      muSource = cms.InputTag(muSource),
-      elSource = cms.InputTag(elSource),
-      btagInfos = bTagInfos,
-      btagDiscriminators = bTagDiscriminators,
-      jetCorrections = jetCorrectionsAK4,
-      genJetCollection = cms.InputTag(genJetCollection),
-      genParticles = cms.InputTag(genParticles),
-      postfix = postfix
-  )
-
-  if isMC:
+  if isMC and addGenNoNu:
     process.fatjetInitSequence = cms.Sequence(
-        process.packedGenParticlesForJetsNoNu+
-        process.ak4GenJetsNoNu
+        process.packedGenParticlesForJetsNoNu
     )
   else:
     process.fatjetInitSequence = cms.Sequence()
   process.fatjetInitSequence += process.pfCHS
-  process.fatjetInitSequence += process.ak4PFJets
 
   return process.fatjetInitSequence
 
@@ -175,7 +124,6 @@ def makeFatJets(process,isData,pfCandidates,algoLabel,jetRadius):
                                                 rParam = cms.double(jetRadius),
                                                 src = cms.InputTag(pfCandidates),
                                                 # srcPVs = cms.InputTag(pvSource),
-                                                doAreaFastjet = cms.bool(False),
                                                 jetPtMin = cms.double(150)
                                             )
   )

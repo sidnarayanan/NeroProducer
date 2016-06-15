@@ -58,8 +58,8 @@ else:
 ###FILELIST###
 
 process.source = cms.Source("PoolSource",
-	skipEvents = cms.untracked.uint32(0),
-    	fileNames = cms.untracked.vstring(fileList)
+  skipEvents = cms.untracked.uint32(0),
+      fileNames = cms.untracked.vstring(fileList)
         )
 
 # ---- define the output file -------------------------------------------
@@ -211,7 +211,7 @@ print "-> Updating the met collection to run on to 'slimmedMETs with nero' with 
 
 ############ RUN CLUSTERING ##########################
 process.puppiSequence = cms.Sequence()
-process.puppiMetSequence = cms.Sequence()
+process.puppiJetMETSequence = cms.Sequence()
 process.jetSequence = cms.Sequence()
 if process.nero.doReclustering:
     if process.nero.doPuppi:
@@ -236,18 +236,59 @@ if process.nero.doReclustering:
         process.puppiSequence += process.puppiPhoton
         process.puppiSequence += process.puppiForMET
 
-
-        # recompute ak4 jets for corrections
+        # recompute ak4 jets
         from RecoJets.JetProducers.ak4PFJets_cfi import ak4PFJets
-        process.ak4PFJetsPuppi = ak4PFJets.clone(src=cms.InputTag('puppiNoLep'))
-        process.puppiMetSequence += process.ak4PFJetsPuppi
+        from RecoJets.JetProducers.ak4GenJets_cfi import ak4GenJets
+        from PhysicsTools.PatAlgos.tools.pfTools import *
 
+        process.ak4PFJetsPuppi = ak4PFJets.clone(src=cms.InputTag('puppiNoLep'))
+        process.packedGenParticlesForJetsNoNu = cms.EDFilter("CandPtrSelector", 
+          src = cms.InputTag("packedGenParticles"), 
+          cut = cms.string("abs(pdgId) != 12 && abs(pdgId) != 14 && abs(pdgId) != 16")
+        )
+        process.ak4GenJetsNoNu = ak4GenJets.clone(src = 'packedGenParticlesForJetsNoNu')
+        process.puppiJetMETSequence += process.ak4PFJetsPuppi
+        process.puppiJetMETSequence += process.packedGenParticlesForJetsNoNu
+        process.puppiJetMETSequence += process.ak4GenJetsNoNu
+
+        # btag and patify jets for access later
+        addJetCollection(
+          process,
+          labelName = 'PFAK4Puppi',
+          jetSource=cms.InputTag('ak4PFJetsPuppi'),
+          algo='AK4',
+          rParam=0.4,
+          pfCandidates = cms.InputTag('packedPFCandidates'),
+          pvSource = cms.InputTag('offlineSlimmedPrimaryVertices'),
+          svSource = cms.InputTag('slimmedSecondaryVertices'),
+          muSource = cms.InputTag('slimmedMuons'),
+          elSource = cms.InputTag('slimmedElectrons'),
+          btagInfos = [
+              'pfImpactParameterTagInfos'
+             ,'pfInclusiveSecondaryVertexFinderTagInfos'
+          ],
+          btagDiscriminators = [
+             'pfCombinedInclusiveSecondaryVertexV2BJetTags'
+          ],
+          genJetCollection = cms.InputTag('ak4GenJetsNoNu'),
+          genParticles = cms.InputTag('prunedGenParticles'),
+          getJetMCFlavour = False, # jet flavor disabled
+        )
+
+        if not isData:
+          process.puppiJetMETSequence += process.patJetPartonMatchPFAK4Puppi
+          process.puppiJetMETSequence += process.patJetGenJetMatchPFAK4Puppi
+        process.puppiJetMETSequence += process.pfImpactParameterTagInfosPFAK4Puppi
+        process.puppiJetMETSequence += process.pfInclusiveSecondaryVertexFinderTagInfosPFAK4Puppi
+        process.puppiJetMETSequence += process.pfCombinedInclusiveSecondaryVertexV2BJetTagsPFAK4Puppi
+        process.puppiJetMETSequence += process.patJetsPFAK4Puppi
+        
         # compute puppi MET
         from RecoMET.METProducers.PFMET_cfi import pfMet
         process.pfMETPuppi = pfMet.clone()
         process.pfMETPuppi.src = cms.InputTag('puppiForMET')
         process.pfMETPuppi.calculateSignificance = False
-        process.puppiMetSequence += process.pfMETPuppi
+        process.puppiJetMETSequence += process.pfMETPuppi
 
         # correct puppi jets
         jeclabel = 'DATA' if isData else 'MC'
@@ -294,9 +335,9 @@ if process.nero.doReclustering:
         process.ak4PuppiL2  = ak4PFCHSL2RelativeCorrector.clone(algorithm = cms.string(jetlabel))
         process.ak4PuppiL3  = ak4PFCHSL3AbsoluteCorrector.clone(algorithm = cms.string(jetlabel))
         process.ak4PuppiRes = ak4PFCHSResidualCorrector.clone  (algorithm = cms.string(jetlabel))
-        process.puppiMetSequence += process.ak4PuppiL1
-        process.puppiMetSequence += process.ak4PuppiL2
-        process.puppiMetSequence += process.ak4PuppiL3
+        process.puppiJetMETSequence += process.ak4PuppiL1
+        process.puppiJetMETSequence += process.ak4PuppiL2
+        process.puppiJetMETSequence += process.ak4PuppiL3
 
         process.ak4PuppiCorrector = ak4PFL1FastL2L3Corrector.clone(
                 correctors = cms.VInputTag("ak4PuppiL1", 
@@ -310,11 +351,11 @@ if process.nero.doReclustering:
                                             'ak4PuppiRes')
             )
         if isData:
-            process.puppiMetSequence += process.ak4PuppiRes
-            process.puppiMetSequence += process.ak4PuppiCorrectorRes
+            process.puppiJetMETSequence += process.ak4PuppiRes
+            process.puppiJetMETSequence += process.ak4PuppiCorrectorRes
             correctorLabel = 'ak4PuppiCorrectorRes'
         else:
-            process.puppiMetSequence += process.ak4PuppiCorrector
+            process.puppiJetMETSequence += process.ak4PuppiCorrector
             correctorLabel = 'ak4PuppiCorrector'
 
         # correct puppi MET
@@ -337,8 +378,8 @@ if process.nero.doReclustering:
             srcCorrections = cms.VInputTag(cms.InputTag('puppiJetMETcorr', 'type1')),
             applyType2Corrections = cms.bool(False)
         )   
-        process.puppiMetSequence += process.puppiJetMETcorr
-        process.puppiMetSequence += process.type1PuppiMET
+        process.puppiJetMETSequence += process.puppiJetMETcorr
+        process.puppiJetMETSequence += process.type1PuppiMET
 
     from NeroProducer.Nero.makeFatJets_cff import *
     if process.nero.doAK8 or process.nero.doCA15:
@@ -390,13 +431,13 @@ process.QGTagger.useQualityCuts = cms.bool(False)
 ###############################
 
 if options.isGrid:
-	process.nero.head=options.nerohead ##'git rev-parse HEAD'
-	process.nero.tag=options.nerotag ## git describe --tags
+    process.nero.head=options.nerohead ##'git rev-parse HEAD'
+    process.nero.tag=options.nerotag ## git describe --tags
 
 if options.isParticleGun:
-	process.nero.particleGun = cms.untracked.bool(True)
-	## this option is for the embedding informations
-	process.nero.extendEvent = cms.untracked.bool(False)
+    process.nero.particleGun = cms.untracked.bool(True)
+    ## this option is for the embedding informations
+    process.nero.extendEvent = cms.untracked.bool(False)
 
 process.load('NeroProducer.Skim.MonoJetFilterSequence_cff')
 
@@ -414,7 +455,7 @@ process.p = cms.Path(
                 process.QGTagger    * ## after jec, because it will produce the new jet collection
                 process.fullPatMetSequence *## no puppi
                 process.puppiSequence *
-                process.puppiMetSequence *
+                process.puppiJetMETSequence *
                 process.jetSequence *
                 process.nero
                 )
@@ -427,8 +468,8 @@ process.p = cms.Path(
 ##process.output_step = cms.EndPath(process.output)
 ##
 ##process.schedule = cms.Schedule(
-##		process.p,
-##		process.output_step)
+##    process.p,
+##    process.output_step)
 
 # Local Variables:
 # mode:c++
