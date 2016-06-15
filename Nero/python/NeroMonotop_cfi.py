@@ -5,10 +5,10 @@ print " ------- LOADING MONO TOP CONFIGURATION -------- "
 
 nero.info = cms.string("NeroMonotop")
 
-nero.minJetPt         = cms.double (20.)
+nero.minJetPt         = cms.double (15.)
 nero.minJetEta        = cms.double (4.7)
 nero.minJetId         = cms.string ('noid')
-nero.minPuppiJetPt    = cms.double (20.)
+nero.minPuppiJetPt    = cms.double (15.)
 nero.minPuppiJetEta   = cms.double (4.7)
 nero.minPuppiJetId    = cms.string ('noid')
 nero.minCA15PuppiPt   = cms.double (150.)
