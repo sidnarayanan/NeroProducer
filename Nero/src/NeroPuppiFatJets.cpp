@@ -9,7 +9,7 @@
 NeroPuppiFatJets::NeroPuppiFatJets() : 
         NeroCollection(),
         BarePuppiFatJets(),
-        mMinId("none"),
+        mMinId("noid"),
         jetRadius(0.8),
         mMCJetCorrector(0),
         mDataJetCorrector(0)

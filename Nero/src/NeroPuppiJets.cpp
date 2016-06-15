@@ -17,7 +17,7 @@ NeroPuppiJets::NeroPuppiJets() :
     mMinPt = 25.;
     mMinNjets = 0;
     mMinEta = 4.7;
-    mMinId = "none";
+    mMinId = "noid";
 }
 
 NeroPuppiJets::~NeroPuppiJets(){
