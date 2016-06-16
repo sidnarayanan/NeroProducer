@@ -35,7 +35,7 @@ class NeroPuppiFatJets : virtual public NeroCollection,
         float jetRadius; // used for subjet matching
         FactorizedJetCorrector *mMCJetCorrector;   // needed for puppi jets
         FactorizedJetCorrector *mDataJetCorrector; 
-
+        
 };
 
 
