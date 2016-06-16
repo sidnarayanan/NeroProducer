@@ -359,7 +359,7 @@ if process.nero.doReclustering:
             correctorLabel = 'ak4PuppiCorrector'
 
         # correct puppi MET
-        process.puppiJetMETcorr = cms.EDProducer("PFJetMETcorrInputProducer",
+        process.puppiMETcorr = cms.EDProducer("PFJetMETcorrInputProducer",
             src = cms.InputTag('ak4PFJetsPuppi'),
             offsetCorrLabel = cms.InputTag('ak4PuppiL1'),
             jetCorrLabel = cms.InputTag(correctorLabel),
@@ -375,10 +375,10 @@ if process.nero.doReclustering:
             src = cms.InputTag('pfMETPuppi'),
             applyType0Corrections = cms.bool(False),
             applyType1Corrections = cms.bool(True),
-            srcCorrections = cms.VInputTag(cms.InputTag('puppiJetMETcorr', 'type1')),
+            srcCorrections = cms.VInputTag(cms.InputTag('puppiMETcorr', 'type1')),
             applyType2Corrections = cms.bool(False)
         )   
-        process.puppiJetMETSequence += process.puppiJetMETcorr
+        process.puppiJetMETSequence += process.puppiMETcorr
         process.puppiJetMETSequence += process.type1PuppiMET
 
     from NeroProducer.Nero.makeFatJets_cff import *
