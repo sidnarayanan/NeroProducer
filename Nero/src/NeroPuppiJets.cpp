@@ -1,21 +1,48 @@
 #include "NeroProducer/Nero/interface/NeroPuppiJets.hpp"
 #include "NeroProducer/Nero/interface/Nero.hpp"
 #include "NeroProducer/Nero/interface/NeroJets.hpp" // JetId
+#include "NeroProducer/Core/interface/BareFunctions.hpp"
+#include <cstdlib>
+#include <string>
 
 //JES
 
 
 NeroPuppiJets::NeroPuppiJets() : 
         NeroCollection(),
-        BarePuppiJets()
+        BarePuppiJets(),
+        mMCJetCorrector(0),
+        mDataJetCorrector(0)
 {
     mMinPt = 25.;
     mMinNjets = 0;
-    mMinEta = 2.5;
-    mMinId = "all";
+    mMinEta = 4.7;
+    mMinId = "noid";
 }
 
 NeroPuppiJets::~NeroPuppiJets(){
+  BareFunctions::Delete(mMCJetCorrector);
+  BareFunctions::Delete(mDataJetCorrector);
+}
+
+void NeroPuppiJets::init()
+{
+   BarePuppiJets::init();
+   std::string jecDir = "jec/";
+
+   std::vector<JetCorrectorParameters> mcParams;
+   mcParams.push_back(JetCorrectorParameters(jecDir + "Fall15_25nsV2_MC_L1FastJet_AK4PFPuppi.txt"));
+   mcParams.push_back(JetCorrectorParameters(jecDir + "Fall15_25nsV2_MC_L2Relative_AK4PFPuppi.txt"));
+   mcParams.push_back(JetCorrectorParameters(jecDir + "Fall15_25nsV2_MC_L3Absolute_AK4PFPuppi.txt"));
+   mcParams.push_back(JetCorrectorParameters(jecDir + "Fall15_25nsV2_MC_L2L3Residual_AK4PFPuppi.txt"));
+   mMCJetCorrector = new FactorizedJetCorrector(mcParams);
+ 
+   std::vector<JetCorrectorParameters> dataParams;
+   dataParams.push_back(JetCorrectorParameters(jecDir + "Fall15_25nsV2_DATA_L1FastJet_AK4PFPuppi.txt"));
+   dataParams.push_back(JetCorrectorParameters(jecDir + "Fall15_25nsV2_DATA_L2Relative_AK4PFPuppi.txt"));
+   dataParams.push_back(JetCorrectorParameters(jecDir + "Fall15_25nsV2_DATA_L3Absolute_AK4PFPuppi.txt"));
+   dataParams.push_back(JetCorrectorParameters(jecDir + "Fall15_25nsV2_DATA_L2L3Residual_AK4PFPuppi.txt"));
+   mDataJetCorrector = new FactorizedJetCorrector(dataParams);
 }
 
 
@@ -25,16 +52,42 @@ int NeroPuppiJets::analyze(const edm::Event& iEvent, const edm::EventSetup &iSet
 
     // maybe handle should be taken before
     iEvent.getByToken(token, handle);
+    iEvent.getByToken(rho_token,rho_handle);
 
     if ( not handle.isValid() ) cout<<"[NeroPuppiJets]::[analyze]::[ERROR] handle is not valid"<<endl;
+    assert(rho_handle.isValid());
+
+    FactorizedJetCorrector *corrector = ( iEvent.isRealData() ) ? mDataJetCorrector : mMCJetCorrector;
 
     for (const pat::Jet& j : *handle)
     {
 
-        if (j.pt() < mMinPt ) continue;
         if ( fabs(j.eta()) > mMinEta ) continue;
         if ( !JetId(j,mMinId) ) continue;
 
+        // do JEC now
+        double this_pt = j.pt(), this_rawpt=0, jecFactor=1;
+        if (reclustered) {
+            this_rawpt = this_pt;
+            if (fabs(j.eta())<5.191) {
+              corrector->setJetPt(j.pt());
+              corrector->setJetEta(j.eta());
+              corrector->setJetPhi(j.phi());
+              corrector->setJetE(j.energy());
+              corrector->setRho(*rho_handle);
+              corrector->setJetA(j.jetArea());
+              corrector->setJetEMF(-99.0);
+              jecFactor = corrector->getCorrection();
+              this_pt *= jecFactor;
+            }
+        } else {
+            this_rawpt = j.pt()*j.jecFactor("Uncorrected");
+        }
+
+        if (this_pt < mMinPt || this_rawpt < mMinPt) continue;
+
+        new ( (*p4)[p4->GetEntriesFast()]) TLorentzVector(j.px()*jecFactor, j.py()*jecFactor, j.pz()*jecFactor, j.energy()*jecFactor);
+        rawPt  -> push_back (this_rawpt);
 
         float charge =  0.;
         float charge_den = 0.;
@@ -51,9 +104,8 @@ int NeroPuppiJets::analyze(const edm::Event& iEvent, const edm::EventSetup &iSet
         if ( charge_den == 0 ) { charge=0.0 ; charge_den =1.0;}  //  guard, if no jet id
 
         // Fill output object	
-        new ( (*p4)[p4->GetEntriesFast()]) TLorentzVector(j.px(), j.py(), j.pz(), j.energy());
-        rawPt  -> push_back (j.pt()*j.jecFactor("Uncorrected"));
         bDiscr -> push_back( j.bDiscriminator("pfCombinedInclusiveSecondaryVertexV2BJetTags") );
+
         unsigned bits=0;
         bits |=  (1 * JetBaseline);
         bits |= JetId(j,"monojet") * mjId;

@@ -186,61 +186,84 @@ if not options.isData:
 
 ############ RUN CLUSTERING ##########################
 process.puppiSequence = cms.Sequence()
-process.puppiMetSequence = cms.Sequence()
+process.puppiJetMETSequence = cms.Sequence()
 process.jetSequence = cms.Sequence()
-
 if process.nero.doReclustering:
     if process.nero.doPuppi:
         # run puppi algo
-        process.load('NeroProducer.Nero.Puppi_cff')
+        #process.load('NeroProducer.Nero.Puppi_cff')
+        process.load('CommonTools.PileupAlgos.Puppi_cff')
 
         process.puppi.candName   = cms.InputTag('packedPFCandidates')
         process.puppi.vertexName = cms.InputTag('offlineSlimmedPrimaryVertices')
 
-        process.pfCandNoLep = cms.EDFilter("CandPtrSelector", 
-                                            src = cms.InputTag("packedPFCandidates"), 
-                                            cut =  cms.string("abs(pdgId) != 13 && abs(pdgId) != 11 && abs(pdgId) != 15"))
-        process.pfCandLep   = cms.EDFilter("CandPtrSelector", 
-                                            src = cms.InputTag("packedPFCandidates"), 
-                                            cut = cms.string("abs(pdgId) == 13 || abs(pdgId) == 11 || abs(pdgId) == 15"))
-
         process.puppiNoLep = process.puppi.clone()
-        process.puppiNoLep.candName = cms.InputTag('pfCandNoLep') 
+        process.puppi.useExistingWeights = False
+        process.puppiNoLep.useExistingWeights = False
+        process.puppiNoLep.useWeightsNoLep = True
 
-        process.puppiMerged = cms.EDProducer("CandViewMerger",src = cms.VInputTag( 'puppiNoLep','pfCandLep'))
+        process.load('CommonTools/PileupAlgos/PhotonPuppi_cff')
+        process.puppiPhoton.weightsName = 'puppiNoLep'
+        process.puppiForMET = cms.EDProducer("CandViewMerger",src = cms.VInputTag( 'puppiPhoton'))
 
-        process.puppiForMET = cms.EDProducer("PuppiPhoton",
-                                             candName       = cms.InputTag('packedPFCandidates'),
-                                             puppiCandName  = cms.InputTag('puppiMerged'),
-                                             photonName     = cms.InputTag('slimmedPhotons'),
-                                             photonId       = cms.InputTag("egmPhotonIDs:cutBasedPhotonID_PHYS14_PU20bx25_V2p1-standalone-loose"),
-                                             pt             = cms.double(10),
-                                             useRefs        = cms.bool(True),
-                                             dRMatch        = cms.vdouble(10,10,10,10),
-                                             pdgids         = cms.vint32 (22,11,211,130),
-                                             weight         = cms.double(1.),
-                                             useValueMap    = cms.bool(False),
-                                             weightsName    = cms.InputTag('puppi'),
-                                             )
-        process.puppiForMET.puppiCandName    = 'puppiMerged'
         process.puppiSequence += process.puppi
-        process.puppiSequence += process.pfCandNoLep
-        process.puppiSequence += process.pfCandLep
         process.puppiSequence += process.puppiNoLep
-        process.puppiSequence += process.puppiMerged
+        process.puppiSequence += process.puppiPhoton
         process.puppiSequence += process.puppiForMET
 
-        # recompute ak4 jets for corrections
+        # recompute ak4 jets
         from RecoJets.JetProducers.ak4PFJets_cfi import ak4PFJets
-        process.ak4PFJetsPuppi = ak4PFJets.clone(src=cms.InputTag('puppiNoLep'))
-        process.puppiMetSequence += process.ak4PFJetsPuppi
+        from RecoJets.JetProducers.ak4GenJets_cfi import ak4GenJets
+        from PhysicsTools.PatAlgos.tools.pfTools import *
 
+        process.ak4PFJetsPuppi = ak4PFJets.clone(src=cms.InputTag('puppiNoLep'))
+        process.packedGenParticlesForJetsNoNu = cms.EDFilter("CandPtrSelector", 
+          src = cms.InputTag("packedGenParticles"), 
+          cut = cms.string("abs(pdgId) != 12 && abs(pdgId) != 14 && abs(pdgId) != 16")
+        )
+        process.ak4GenJetsNoNu = ak4GenJets.clone(src = 'packedGenParticlesForJetsNoNu')
+        process.puppiJetMETSequence += process.ak4PFJetsPuppi
+        process.puppiJetMETSequence += process.packedGenParticlesForJetsNoNu
+        process.puppiJetMETSequence += process.ak4GenJetsNoNu
+
+        # btag and patify jets for access later
+        addJetCollection(
+          process,
+          labelName = 'PFAK4Puppi',
+          jetSource=cms.InputTag('ak4PFJetsPuppi'),
+          algo='AK4',
+          rParam=0.4,
+          pfCandidates = cms.InputTag('packedPFCandidates'),
+          pvSource = cms.InputTag('offlineSlimmedPrimaryVertices'),
+          svSource = cms.InputTag('slimmedSecondaryVertices'),
+          muSource = cms.InputTag('slimmedMuons'),
+          elSource = cms.InputTag('slimmedElectrons'),
+          btagInfos = [
+              'pfImpactParameterTagInfos'
+             ,'pfInclusiveSecondaryVertexFinderTagInfos'
+          ],
+          btagDiscriminators = [
+             'pfCombinedInclusiveSecondaryVertexV2BJetTags'
+          ],
+          genJetCollection = cms.InputTag('ak4GenJetsNoNu'),
+          genParticles = cms.InputTag('prunedGenParticles'),
+          getJetMCFlavour = False, # jet flavor disabled
+        )
+
+        if not isData:
+          process.puppiJetMETSequence += process.patJetPartonMatchPFAK4Puppi
+          process.puppiJetMETSequence += process.patJetGenJetMatchPFAK4Puppi
+        process.puppiJetMETSequence += process.pfImpactParameterTagInfosPFAK4Puppi
+        process.puppiJetMETSequence += process.pfInclusiveSecondaryVertexFinderTagInfosPFAK4Puppi
+        process.puppiJetMETSequence += process.pfCombinedInclusiveSecondaryVertexV2BJetTagsPFAK4Puppi
+        process.puppiJetMETSequence += process.patJetsPFAK4Puppi
+        
         # compute puppi MET
         from RecoMET.METProducers.PFMET_cfi import pfMet
         process.pfMETPuppi = pfMet.clone()
         process.pfMETPuppi.src = cms.InputTag('puppiForMET')
         process.pfMETPuppi.calculateSignificance = False
-        process.puppiMetSequence += process.pfMETPuppi
+        process.puppiJetMETSequence += process.pfMETPuppi
 
         # correct puppi jets
         jeclabel = 'DATA' if isData else 'MC'
@@ -287,9 +310,9 @@ if process.nero.doReclustering:
         process.ak4PuppiL2  = ak4PFCHSL2RelativeCorrector.clone(algorithm = cms.string(jetlabel))
         process.ak4PuppiL3  = ak4PFCHSL3AbsoluteCorrector.clone(algorithm = cms.string(jetlabel))
         process.ak4PuppiRes = ak4PFCHSResidualCorrector.clone  (algorithm = cms.string(jetlabel))
-        process.puppiMetSequence += process.ak4PuppiL1
-        process.puppiMetSequence += process.ak4PuppiL2
-        process.puppiMetSequence += process.ak4PuppiL3
+        process.puppiJetMETSequence += process.ak4PuppiL1
+        process.puppiJetMETSequence += process.ak4PuppiL2
+        process.puppiJetMETSequence += process.ak4PuppiL3
 
         process.ak4PuppiCorrector = ak4PFL1FastL2L3Corrector.clone(
                 correctors = cms.VInputTag("ak4PuppiL1", 
@@ -303,15 +326,15 @@ if process.nero.doReclustering:
                                             'ak4PuppiRes')
             )
         if isData:
-            process.puppiMetSequence += process.ak4PuppiRes
-            process.puppiMetSequence += process.ak4PuppiCorrectorRes
+            process.puppiJetMETSequence += process.ak4PuppiRes
+            process.puppiJetMETSequence += process.ak4PuppiCorrectorRes
             correctorLabel = 'ak4PuppiCorrectorRes'
         else:
-            process.puppiMetSequence += process.ak4PuppiCorrector
+            process.puppiJetMETSequence += process.ak4PuppiCorrector
             correctorLabel = 'ak4PuppiCorrector'
 
         # correct puppi MET
-        process.puppiJetMETcorr = cms.EDProducer("PFJetMETcorrInputProducer",
+        process.puppiMETcorr = cms.EDProducer("PFJetMETcorrInputProducer",
             src = cms.InputTag('ak4PFJetsPuppi'),
             offsetCorrLabel = cms.InputTag('ak4PuppiL1'),
             jetCorrLabel = cms.InputTag(correctorLabel),
@@ -327,22 +350,22 @@ if process.nero.doReclustering:
             src = cms.InputTag('pfMETPuppi'),
             applyType0Corrections = cms.bool(False),
             applyType1Corrections = cms.bool(True),
-            srcCorrections = cms.VInputTag(cms.InputTag('puppiJetMETcorr', 'type1')),
+            srcCorrections = cms.VInputTag(cms.InputTag('puppiMETcorr', 'type1')),
             applyType2Corrections = cms.bool(False)
         )   
-        process.puppiMetSequence += process.puppiJetMETcorr
-        process.puppiMetSequence += process.type1PuppiMET
+        process.puppiJetMETSequence += process.puppiMETcorr
+        process.puppiJetMETSequence += process.type1PuppiMET
 
     from NeroProducer.Nero.makeFatJets_cff import *
     if process.nero.doAK8 or process.nero.doCA15:
         fatjetInitSequence = initFatJets(process,isData)
         process.jetSequence += fatjetInitSequence
     if process.nero.doAK8 and process.nero.doPuppi:
-        ak8PuppiSequence = makeFatJets(process,isData=isData,pfCandidates='puppiForMET',algoLabel='AK',jetRadius=0.8)
+        ak8PuppiSequence = makeFatJets(process,isData=isData,pfCandidates='puppi',algoLabel='AK',jetRadius=0.8)
         process.jetSequence += ak8PuppiSequence
     if process.nero.doCA15:
         if process.nero.doPuppi:
-            ca15PuppiSequence = makeFatJets(process,isData=isData,pfCandidates='puppiForMET',algoLabel='CA',jetRadius=1.5)
+            ca15PuppiSequence = makeFatJets(process,isData=isData,pfCandidates='puppi',algoLabel='CA',jetRadius=1.5)
             process.jetSequence += ca15PuppiSequence
         else:
             ca15CHSSequence = makeFatJets(process,isData=isData,pfCandidates='pfCHS',algoLabel='CA',jetRadius=1.5)
@@ -405,7 +428,7 @@ process.p = cms.Path(
                 process.QGTagger    * ## after jec, because it will produce the new jet collection
                 process.fullPatMetSequence *## no puppi
                 process.puppiSequence *
-                process.puppiMetSequence *
+                process.puppiJetMETSequence *
                 process.jetSequence *
                 process.nero
                 )
