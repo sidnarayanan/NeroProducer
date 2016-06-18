@@ -3,6 +3,9 @@
 
 #include "NeroProducer/Nero/interface/NeroCollection.hpp"
 #include "NeroProducer/Core/interface/BarePuppiJets.hpp"
+#include "CondFormats/JetMETObjects/interface/JetCorrectorParameters.h"
+#include "CondFormats/JetMETObjects/interface/FactorizedJetCorrector.h"
+#include "CondFormats/JetMETObjects/interface/JetCorrectionUncertainty.h"
 
 
 //
@@ -17,21 +20,27 @@ class NeroPuppiJets : virtual public NeroCollection, virtual public BarePuppiJet
         int analyze(const edm::Event& iEvent, const edm::EventSetup&iSetup);
         int analyze(const edm::Event& iEvent){return 2;} // never called
         virtual inline string name(){return "NeroPuppiJets";};
+        void init() override;
 
         // --- specific fuctions
         static bool JetId(const pat::Jet &, string id);
 
         // --- Handle
-        edm::Handle<pat::JetCollection> handle;	
+        edm::Handle<pat::JetCollection> handle; 
+        edm::Handle<double> rho_handle;
 
         // --- Token
         edm::EDGetTokenT<pat::JetCollection> token;
+        edm::EDGetTokenT<double> rho_token;
 
         // --- configuration
         float mMinPt;
         int   mMinNjets;
         float mMinEta;
         string mMinId;
+        bool reclustered=false; // means we need to apply JEC
+        FactorizedJetCorrector *mMCJetCorrector;   // needed for puppi fat jets
+        FactorizedJetCorrector *mDataJetCorrector; 
 
         // extra info
         NeroPF *pf;

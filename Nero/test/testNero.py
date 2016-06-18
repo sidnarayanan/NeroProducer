@@ -271,37 +271,37 @@ if process.nero.doReclustering:
                             CondDBSetup,
                             toGet = cms.VPSet(
                       cms.PSet(record  = cms.string('JetCorrectionsRecord'),
-                               tag     = cms.string('JetCorrectorParametersCollection_Fall15_25nsV2_'+jeclabel+'_AK4PFPuppi'),
+                               tag     = cms.string('JetCorrectorParametersCollection_Spring16_25nsV3_'+jeclabel+'_AK4PFPuppi'),
                                label   = cms.untracked.string('AK4Puppi')
                                ),
                        cms.PSet(record  = cms.string('JetCorrectionsRecord'),
-                                tag     = cms.string('JetCorrectorParametersCollection_Fall15_25nsV2_'+jeclabel+'_AK8PFPuppi'),
+                                tag     = cms.string('JetCorrectorParametersCollection_Spring16_25nsV3_'+jeclabel+'_AK8PFPuppi'),
                                 label   = cms.untracked.string('AK8Puppi')
                                 ),
                       cms.PSet(record  = cms.string('JetCorrectionsRecord'),
-                               tag     = cms.string('JetCorrectorParametersCollection_Fall15_25nsV2_'+jeclabel+'_AK4PFchs'),
+                               tag     = cms.string('JetCorrectorParametersCollection_Spring16_25nsV3_'+jeclabel+'_AK4PFchs'),
                                label   = cms.untracked.string('AK4chs')
                                ),
                       cms.PSet(record  = cms.string('JetCorrectionsRecord'),
-                               tag     = cms.string('JetCorrectorParametersCollection_Fall15_25nsV2_'+jeclabel+'_AK8PFchs'),
+                               tag     = cms.string('JetCorrectorParametersCollection_Spring16_25nsV3_'+jeclabel+'_AK8PFchs'),
                                label   = cms.untracked.string('AK8chs')
                                ),
                       cms.PSet(record  = cms.string('JetCorrectionsRecord'),
-                               tag     = cms.string('JetCorrectorParametersCollection_Fall15_25nsV2_'+jeclabel+'_AK4PF'),
+                               tag     = cms.string('JetCorrectorParametersCollection_Spring16_25nsV3_'+jeclabel+'_AK4PF'),
                                label   = cms.untracked.string('AK4')
                                ),
                        cms.PSet(record  = cms.string('JetCorrectionsRecord'),
-                                tag     = cms.string('JetCorrectorParametersCollection_Fall15_25nsV2_'+jeclabel+'_AK8PF'),
+                                tag     = cms.string('JetCorrectorParametersCollection_Spring16_25nsV3_'+jeclabel+'_AK8PF'),
                                 label   = cms.untracked.string('AK8')
                                 )
                        ),
 
                 )  
         if isData:
-          #process.jec.connect = cms.string('sqlite:////'+cmssw_base+'/src/NeroProducer/Nero/test/jec/Fall15_25nsV2_DATA.db')
-          process.jec.connect = cms.string('sqlite:jec/Fall15_25nsV2_DATA.db')
+          #process.jec.connect = cms.string('sqlite:////'+cmssw_base+'/src/NeroProducer/Nero/test/jec/Spring16_25nsV3_DATA.db')
+          process.jec.connect = cms.string('sqlite:jec/Spring16_25nsV3_DATA.db')
         else:
-          process.jec.connect = cms.string('sqlite:jec/Fall15_25nsV2_MC.db')
+          process.jec.connect = cms.string('sqlite:jec/Spring16_25nsV3_MC.db')
         process.es_prefer_jec = cms.ESPrefer('PoolDBESSource', 'jec')
 
         from JetMETCorrections.Configuration.JetCorrectorsAllAlgos_cff  import *
