@@ -12,7 +12,7 @@ from RecoBTag.Configuration.RecoBTag_cff import *
 
 
 def initFatJets(process,isData):
-  adaptPVs(process, pvCollection=cms.InputTag('offlineSlimmedPrimaryVertices'))
+  # adaptPVs(process, pvCollection=cms.InputTag('offlineSlimmedPrimaryVertices'))
   isMC = not isData
 
   ########################################
@@ -333,6 +333,7 @@ def makeFatJets(process,isData,pfCandidates,algoLabel,jetRadius):
       getattr(process,'packedPatJetsPF'+neroLabel)
   )
 
-  if isData:
-      removeMCMatching(process, ['All'], outputModules = [])
+#  if isData:
+#      toRemove = ['Photons', 'Electrons','Muons', 'Taus', 'Jets', 'METs', 'PFElectrons','PFTaus','PFMuons']
+#      removeMCMatching(process, toRemove, outputModules = [])
   return newSeq

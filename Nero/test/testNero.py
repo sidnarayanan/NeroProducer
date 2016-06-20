@@ -217,14 +217,17 @@ if process.nero.doReclustering:
         from PhysicsTools.PatAlgos.tools.pfTools import *
 
         process.ak4PFJetsPuppi = ak4PFJets.clone(src=cms.InputTag('puppiNoLep'))
-        process.packedGenParticlesForJetsNoNu = cms.EDFilter("CandPtrSelector", 
-          src = cms.InputTag("packedGenParticles"), 
-          cut = cms.string("abs(pdgId) != 12 && abs(pdgId) != 14 && abs(pdgId) != 16")
-        )
-        process.ak4GenJetsNoNu = ak4GenJets.clone(src = 'packedGenParticlesForJetsNoNu')
         process.puppiJetMETSequence += process.ak4PFJetsPuppi
-        process.puppiJetMETSequence += process.packedGenParticlesForJetsNoNu
-        process.puppiJetMETSequence += process.ak4GenJetsNoNu
+        if not isData:
+            process.packedGenParticlesForJetsNoNu = cms.EDFilter("CandPtrSelector", 
+              src = cms.InputTag("packedGenParticles"), 
+              cut = cms.string("abs(pdgId) != 12 && abs(pdgId) != 14 && abs(pdgId) != 16")
+            )
+            process.ak4GenJetsNoNu = ak4GenJets.clone(src = 'packedGenParticlesForJetsNoNu')
+            process.puppiJetMETSequence += process.packedGenParticlesForJetsNoNu
+            process.puppiJetMETSequence += process.ak4GenJetsNoNu
+
+        
 
         # btag and patify jets for access later
         addJetCollection(
