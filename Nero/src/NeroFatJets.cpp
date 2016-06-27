@@ -64,7 +64,7 @@ int NeroFatJets::analyze(const edm::Event& iEvent){
         if (j.pt() < mMinPt || fabs(j.eta()) > mMaxEta) continue;
         
         // JET ID
-        if ( !NeroJets::JetId(j,mMinId) ) continue;
+        if ( !JetId(j,mMinId) ) continue;
         
         // GET  ValueMaps
         
@@ -105,9 +105,29 @@ int NeroFatJets::analyze(const edm::Event& iEvent){
             nsubjet++;
         }
         nSubjets->push_back(nsubjetThisJet);
+
+        unsigned bits=0;
+        bits |=  (1 * BareJets::JetBaseline);
+        bits |= JetId(j,"monojet") * BareJets::mjId;
+        bits |= JetId(j,"monojetloose") * BareJets::mjIdLoose;
+        bits |= JetId(j,"monojet2015") * BareJets::mjId2015;
+        bits |= JetId(j,"loose") * BareJets::JetLoose;
+        bits |= JetId(j,"tight") * BareJets::JetTight;
+        selBits -> push_back( bits);
+
     }
         
     return 0;
+}
+
+
+bool NeroFatJets::JetId(const pat::Jet &j, std::string id)
+{
+    bool jetid = false;
+
+    jetid= NeroJets::JetId(j,id);
+
+    return jetid;
 }
 
 // Local Variables:

@@ -107,12 +107,12 @@ int NeroPuppiJets::analyze(const edm::Event& iEvent, const edm::EventSetup &iSet
         bDiscr -> push_back( j.bDiscriminator("pfCombinedInclusiveSecondaryVertexV2BJetTags") );
 
         unsigned bits=0;
-        bits |=  (1 * JetBaseline);
-        bits |= JetId(j,"monojet") * mjId;
-        bits |= JetId(j,"monojetloose") * mjIdLoose;
-        bits |= JetId(j,"monojet2015") * mjId2015;
-        bits |= JetId(j,"loose") * JetLoose;
-        bits |= JetId(j,"tight") * JetTight;
+        bits |=  (1 * BareJets::JetBaseline);
+        bits |= JetId(j,"monojet") * BareJets::mjId;
+        bits |= JetId(j,"monojetloose") * BareJets::mjIdLoose;
+        bits |= JetId(j,"monojet2015") * BareJets::mjId2015;
+        bits |= JetId(j,"loose") * BareJets::JetLoose;
+        bits |= JetId(j,"tight") * BareJets::JetTight;
 
         selBits -> push_back( bits);
         Q -> push_back (charge/charge_den);

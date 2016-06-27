@@ -18,6 +18,8 @@ class NeroPuppiFatJets : virtual public NeroCollection,
         void init() override;
 
         // --- specific fuctions
+        static bool JetId(const pat::Jet &, string id);
+
         // --- Handle
         edm::Handle<pat::JetCollection> handle;	
         edm::Handle<double> rho_handle;

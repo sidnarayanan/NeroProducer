@@ -25,6 +25,7 @@ class BarePuppiFatJets : virtual public BareP4
 
         // variables --
         vector<float> *rawPt{0};
+        vector<unsigned> *selBits{0};
         vector<int>   *flavour{0};
         vector<float> *tau1{0};
         vector<float> *tau2{0};

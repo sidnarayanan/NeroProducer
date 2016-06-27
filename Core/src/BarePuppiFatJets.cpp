@@ -6,6 +6,7 @@ BarePuppiFatJets::BarePuppiFatJets() : BareP4() {}
 BarePuppiFatJets::~BarePuppiFatJets(){
     BareFunctions::Delete(rawPt);
     BareFunctions::Delete(flavour        );
+    BareFunctions::Delete(selBits        );
     BareFunctions::Delete(tau1           );
     BareFunctions::Delete(tau2           );
     BareFunctions::Delete(tau3           );
@@ -23,6 +24,7 @@ BarePuppiFatJets::~BarePuppiFatJets(){
 void BarePuppiFatJets::init(){
     BareP4::init();
     BareFunctions::New(rawPt);
+    BareFunctions::New(selBits);
     BareFunctions::New(flavour);
     BareFunctions::New(tau1);
     BareFunctions::New(tau2);
@@ -42,6 +44,7 @@ void BarePuppiFatJets::clear(){
     BareP4::clear();
     p4 -> Clear();
     rawPt -> clear();
+    selBits -> clear();
     flavour -> clear();
     tau1 -> clear();
     tau2 -> clear();
@@ -67,6 +70,7 @@ void BarePuppiFatJets::defineBranches(TTree *t){
     //
     t->Branch(jetName + "RawPt","vector<float>",&rawPt);
     t->Branch(jetName + "Flavour","vector<int>",&flavour);
+    t->Branch(jetName + "SelBits","vector<unsigned>",&selBits);
     //
     t->Branch(jetName + "Tau1","vector<float>",&tau1);
     t->Branch(jetName + "Tau2","vector<float>",&tau2);
@@ -98,6 +102,7 @@ void BarePuppiFatJets::setBranchAddresses(TTree* t, std::string prefix)
     BareFunctions::SetBranchAddress(t,jetName + "RawPt", &rawPt);
 
     BareFunctions::SetBranchAddress(t,jetName + "Flavour" ,&flavour);
+    BareFunctions::SetBranchAddress(t,jetName + "SelBits", &selBits);
     BareFunctions::SetBranchAddress(t,jetName + "Tau1"  ,&tau1);
     BareFunctions::SetBranchAddress(t,jetName + "Tau2"  ,&tau2);
     BareFunctions::SetBranchAddress(t,jetName + "Tau3"  ,&tau3);

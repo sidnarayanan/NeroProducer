@@ -1,5 +1,5 @@
 #include "NeroProducer/Nero/interface/NeroPuppiFatJets.hpp"
-#include "NeroProducer/Nero/interface/NeroPuppiJets.hpp" // JetId
+#include "NeroProducer/Nero/interface/NeroJets.hpp" // JetId
 #include "NeroProducer/Nero/interface/Nero.hpp"
 #include "NeroProducer/Core/interface/BareFunctions.hpp"
 #include <cstdlib>
@@ -77,7 +77,7 @@ int NeroPuppiFatJets::analyze(const edm::Event& iEvent)
         ijetRef++;
 
         if (fabs(j.eta() ) > mMaxEta)  continue; 
-        if ( !NeroPuppiJets::JetId(j,mMinId) ) continue;
+        if ( !JetId(j,mMinId) ) continue;
         // pT cut applied after applying JEC if necessary
 
         // GET  ValueMaps
@@ -126,6 +126,25 @@ int NeroPuppiFatJets::analyze(const edm::Event& iEvent)
 
           nSubjets->push_back(nsubjetThisJet);
 
+          unsigned bits=0;
+          bits |=  (1 * BareJets::JetBaseline);
+          bits |= JetId(j,"monojet") * BareJets::mjId;
+          bits |= JetId(j,"monojetloose") * BareJets::mjIdLoose;
+          bits |= JetId(j,"monojet2015") * BareJets::mjId2015;
+          bits |= JetId(j,"loose") * BareJets::JetLoose;
+          bits |= JetId(j,"tight") * BareJets::JetTight;
+          selBits -> push_back( bits);
+
+
     }
     return 0;
+}
+
+bool NeroPuppiFatJets::JetId(const pat::Jet &j, std::string id)
+{
+    bool jetid = false;
+
+    jetid= NeroJets::JetId(j,id);
+
+    return jetid;
 }
