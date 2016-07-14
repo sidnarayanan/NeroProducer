@@ -24,6 +24,8 @@ class NeroEvent : virtual public NeroCollection, virtual public BareEvent
 
         // --- met filters
         edm::EDGetTokenT<edm::TriggerResults> filter_token;
+        edm::EDGetTokenT<bool> BadChCandFilterToken;
+        edm::EDGetTokenT<bool> BadPFMuonFilterToken;
         
         // need to convert the name to bit in the enum
         map<string,unsigned> metNameToBit;

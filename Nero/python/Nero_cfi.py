@@ -74,6 +74,8 @@ nero = cms.EDAnalyzer("Nero",
                                   ]),
     #metFilterToken = cms.InputTag("TriggerResults"),          
     metFilterToken = cms.InputTag("TriggerResults","","RECO"),          
+    BadChargedCandidateFilter = cms.InputTag("BadChargedCandidateFilter"),
+    BadPFMuonFilter = cms.InputTag("BadPFMuonFilter"),
 
     #
     ## TRIGGER

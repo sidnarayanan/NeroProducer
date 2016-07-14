@@ -16,6 +16,9 @@ class BareEvent : virtual public BareCollection
             goodVertices           = 1UL << 5,
             eeBadScFilter          = 1UL << 6,
             GlobalTightHalo2016    = 1UL << 7,
+            BadPFMuon              = 1UL << 8,
+            BadChargedCand         = 1UL << 9,
+
             Unknown                = 1UL << 31 // if matching do not work, put it here, but keep the full correct
         };
 

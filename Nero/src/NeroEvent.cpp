@@ -69,9 +69,18 @@ int NeroEvent::analyze(const edm::Event& iEvent){
             }
         }
 
-
-
         filter |= ((*passesMETFilters) * FullRecommendation);
+
+        // currently keep these separate from FullRecommendation in case there's a bug
+        edm::Handle<bool> ifilterbadChCand; iEvent.getByToken(BadChCandFilterToken, ifilterbadChCand);
+        bool  filterbadChCandidate = *ifilterbadChCand;
+        filter |= filterbadChCandidate * BadChargedCand;
+
+        edm::Handle<bool> ifilterbadPFMuon;
+        iEvent.getByToken(BadPFMuonFilterToken, ifilterbadPFMuon);
+        bool filterbadPFMuon = *ifilterbadPFMuon;
+        filter |= filterbadPFMuon * BadPFMuon;
+
 
         selBits = filter;                
 
