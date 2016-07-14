@@ -184,6 +184,16 @@ process.nero.mets=cms.InputTag('slimmedMETs','','nero')
 if not options.isData:
             process.nero.metFilterToken=cms.InputTag("TriggerResults","","PAT")
 
+process.load('RecoMET.METFilters.BadPFMuonFilter_cfi')
+process.BadPFMuonFilter.muons = cms.InputTag("slimmedMuons")
+process.BadPFMuonFilter.PFCandidates = cms.InputTag("packedPFCandidates")
+
+process.load('RecoMET.METFilters.BadChargedCandidateFilter_cfi')
+process.BadChargedCandidateFilter.muons = cms.InputTag("slimmedMuons")
+process.BadChargedCandidateFilter.PFCandidates = cms.InputTag("packedPFCandidates")
+
+process.metFilterSequence = cms.Sequence(process.BadPFMuonFilter*process.BadChargedCandidateFilter)
+
 ############ RUN CLUSTERING ##########################
 process.puppiSequence = cms.Sequence()
 process.puppiJetMETSequence = cms.Sequence()
@@ -433,6 +443,7 @@ process.p = cms.Path(
                 process.puppiSequence *
                 process.puppiJetMETSequence *
                 process.jetSequence *
+                process.metFilterSequence *
                 process.nero
                 )
 
